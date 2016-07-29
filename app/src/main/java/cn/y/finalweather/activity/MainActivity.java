@@ -1,7 +1,9 @@
-package cn.y.finalweather;
+package cn.y.finalweather.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import cn.y.finalweather.R;
 
 public class MainActivity extends AppCompatActivity {
 
