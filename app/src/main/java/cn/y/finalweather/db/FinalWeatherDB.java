@@ -15,7 +15,7 @@ import cn.y.finalweather.model.City;
  * 修订历史：
  */
 public class FinalWeatherDB {
-    public static final String DB_NAME = "final_weather";
+    public static final String DB_NAME = "final_weather.db";
     public static final int VERSION = 1;
     public static FinalWeatherDB finalWeatherDB;
     private SQLiteDatabase db;
@@ -34,12 +34,13 @@ public class FinalWeatherDB {
     public void saveCity(City city) {
         if (city != null){
             ContentValues values = new ContentValues();
-            values.put("cityCode",city.getCityCode());
-            values.put("cityName",city.getCityName());
+            values.put("cityCode",city.getId());
+            values.put("cityName",city.getCity());
             values.put("cnty",city.getCnty());
             values.put("lat",city.getLat());
             values.put("lon",city.getLon());
             values.put("prov",city.getProv());
+            db.insert("City",null,values);
         }
     }
 }

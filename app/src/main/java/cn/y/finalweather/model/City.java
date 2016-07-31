@@ -9,28 +9,23 @@ package cn.y.finalweather.model;
  * 修订历史：
  */
 public class City {
-    private String cityName;
+    private String city;
     private String cnty;
-    private int id;
-    private String cityCode;
+    private String id;
     private float lat;
     private float lon;
     private String prov;
 
-    public String getCityCode() {
-        return cityCode;
+    public String getCity() {
+        return city;
     }
 
-    public String getCityName() {
-        return cityName;
+    public String getId() {
+        return id;
     }
 
     public String getCnty() {
         return cnty;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public float getLat() {
@@ -45,20 +40,16 @@ public class City {
         return prov;
     }
 
-    public void setCityCode(String cityCode) {
-        this.cityCode = cityCode;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setCnty(String cnty) {
         this.cnty = cnty;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setLat(float lat) {
