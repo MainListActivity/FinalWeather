@@ -2,7 +2,11 @@ package cn.y.finalweather.db;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.y.finalweather.model.City;
 
@@ -41,6 +45,38 @@ public class FinalWeatherDB {
             values.put("lon",city.getLon());
             values.put("prov",city.getProv());
             db.insert("City",null,values);
+        }
+    }
+
+    public List<City> loadCities(){
+        List<City> cities = new ArrayList<>();
+        Cursor cursor = db.query("City",null,null,null,null,null,null);
+        if (cursor.moveToFirst()){
+            do {
+                City city = new City();
+                city.setCity(cursor.getString(cursor.getColumnIndex("cityName")));
+                city.setId(cursor.getString(cursor.getColumnIndex("cityCode")));
+                city.setCnty(cursor.getString(cursor.getColumnIndex("cnty")));
+                city.setLat(cursor.getFloat(cursor.getColumnIndex("lat")));
+                city.setLon(cursor.getFloat(cursor.getColumnIndex("lon")));
+                city.setProv(cursor.getString(cursor.getColumnIndex("prov")));
+                city.setCustomId(cursor.getInt(cursor.getColumnIndex("id")));
+                cities.add(city);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return cities;
+    }
+    public void updateDB(City city,String id){
+        if (city != null){
+            ContentValues values = new ContentValues();
+            values.put("cityCode",city.getId());
+            values.put("cityName",city.getCity());
+            values.put("cnty",city.getCnty());
+            values.put("lat",city.getLat());
+            values.put("lon",city.getLon());
+            values.put("prov",city.getProv());
+            db.update("City",values,"id = ?",new String[]{id});
         }
     }
 }

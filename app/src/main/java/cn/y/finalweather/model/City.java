@@ -15,6 +15,7 @@ public class City {
     private float lat;
     private float lon;
     private String prov;
+    private int customId;
 
     public String getCity() {
         return city;
@@ -40,6 +41,10 @@ public class City {
         return prov;
     }
 
+    public int getCustomId() {
+        return customId;
+    }
+
     public void setCity(String city) {
         this.city = city;
     }
@@ -62,6 +67,10 @@ public class City {
 
     public void setProv(String prov) {
         this.prov = prov;
+    }
+
+    public void setCustomId(int customId) {
+        this.customId = customId;
     }
 }
 

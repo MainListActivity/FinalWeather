@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyActionBarTabText" parent="@style/Widget.AppCompat.ActionBar.TabBar">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="my_actionbar_style" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="titleTextStyle">@style/MyActionBarTabText</item>
+        <item name="background">@color/colorPrimary</item>
+        <item name="homeAsUpIndicator">@mipmap/ic_launcher</item>
+    </style>
+    <style name="AnimationActivity" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_left_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_right_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
+    </style>
+</resources>

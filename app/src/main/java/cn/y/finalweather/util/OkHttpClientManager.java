@@ -587,9 +587,10 @@ public class OkHttpClientManager
             {
                 try
                 {
-                    Gson mGson = new GsonBuilder().enableComplexMapKeySerialization().create();
+                    //Gson mGson = new GsonBuilder().enableComplexMapKeySerialization().create();
                     final String string = response.body().string();
-                    JsonReader jsonReader = new JsonReader(new InputStreamReader(response.body().byteStream(),"UTF-8"));
+//                    InputStream is = response.body().byteStream();
+//                    JsonReader jsonReader = new JsonReader(new InputStreamReader(is,"UTF-8"));
                     if (callback.mType == String.class)
                     {
                         sendSuccessResultCallback(string, callback);
@@ -597,12 +598,13 @@ public class OkHttpClientManager
                     {
                         Object o;
                         Log.d(TAG,response.body().contentLength()+"");
-                        if(response.body().contentLength() > 1000000){
-                            Log.d(TAG,"response.body().contentLength() > 1000000");
+                        Log.d(TAG,string.length()+"");
+//                        if(response.body().contentLength() > 1000000){
+//
+//                            o = mGson.fromJson(jsonReader, callback.mType);
+//                        }else {
                             o = mGson.fromJson(string, callback.mType);
-                        }else {
-                            o = mGson.fromJson(string, callback.mType);
-                        }
+//                        }
                         sendSuccessResultCallback(o, callback);
                     }
 

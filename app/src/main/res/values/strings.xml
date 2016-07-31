@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FinalWeather</string>
+    <string name="action_search">搜索</string>
 </resources>
