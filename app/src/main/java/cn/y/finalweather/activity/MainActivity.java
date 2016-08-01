@@ -27,6 +27,8 @@ import cn.y.finalweather.R;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.City;
 import cn.y.finalweather.model.CityInfo;
+import cn.y.finalweather.model.Condition;
+import cn.y.finalweather.model.ConditionInfo;
 import cn.y.finalweather.util.OkHttpClientManager;
 
 /**
@@ -38,8 +40,8 @@ import cn.y.finalweather.util.OkHttpClientManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static String FULL_CITY_URL = "https://api.heweather.com/x3/citylist?search=allworld&key=9c121f3f984f4dde86917788a38b9956";
-    public static final String WEATHER_URL = "https://api.heweather.com/x3/weather?cityid=CN101290606&key=9c121f3f984f4dde86917788a38b9956";
+    public static final String FULL_CITY_URL = "https://api.heweather.com/x3/citylist?search=allworld&key=9c121f3f984f4dde86917788a38b9956";
+    private String CONDITION_URL = "https://api.heweather.com/x3/condition?search=allcond&key=9c121f3f984f4dde86917788a38b9956";
     public static final int MSG_NET_CON = 0x00;
     public static final int MSG_PROGRESS_CHANGED = 0x01;
     public static final String TAG = "MainActivity";
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
+        saveConditionInDb();
         //saveInDb();
 
 
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 //        tv.setText(cities.get(0).getCity()+"\n"+cities.get(1).getCity());
     }
 
-    private void saveInDb(final Intent intent) {
+    private void saveCityInDb(final Intent intent) {
         progressDialog = ProgressDialog.show(MainActivity.this, TAG, "网络访问中。。。。");
 //        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         OkHttpClientManager.getAsyn(FULL_CITY_URL, new OkHttpClientManager.ResultCallback<CityInfo>() {
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
                                 if (cities1.size() > cities.indexOf(city)) {
                                     Log.d(TAG, cities1.get(cities.indexOf(city)).getCity() + ",读出：" + cities1.get(cities.indexOf(city)).getId());
                                     if (!city.getId().equals(cities1.get(cities.indexOf(city)).getId())) {
-                                        db.updateDB(city, (cities.indexOf(city) + 1) + "");
+                                        db.updateCityDB(city, (cities.indexOf(city) + 1) + "");
                                     }
                                 } else {
                                     db.saveCity(city);
@@ -135,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             Log.d(TAG, "全部已存入数据库!");
                             if (intent != null)
-                                startActivity(intent);
+                                startActivityForResult(intent,0);
                         }
 
 
@@ -144,6 +146,51 @@ public class MainActivity extends AppCompatActivity {
 //                progressDialog.dismiss();
             }
         });
+    }
+
+    private void saveConditionInDb() {
+        OkHttpClientManager.getAsyn(CONDITION_URL, new OkHttpClientManager.ResultCallback<ConditionInfo>() {
+            @Override
+            public void onError(Request request, Exception e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(ConditionInfo response) {
+                List<Condition> conditions = response.getCond_info();
+                List<Condition> conditionList = db.getCondition(new String[]{});
+                Log.d(TAG, "conditions: " + conditions.size() + "\nconditionList: " + conditionList.size());
+                if (conditionList != conditions) {
+                    for (Condition condition : conditions) {
+                        if (conditionList.size() > conditions.indexOf(condition)) {
+//                            Log.d(TAG, conditionList.get(conditions.indexOf(condition)).getCode() + ",读出：" + conditionList.get(conditions.indexOf(condition)).getIcon());
+                            if (condition.getCode() != conditionList.get(conditions.indexOf(condition)).getCode()) {
+                                db.updateConditionDB(condition, (conditions.indexOf(condition) + 1) + "");
+                            }
+                        } else {
+                            db.saveCondition(condition);
+//                            Log.d(TAG, "已存入数据库!" + condition.getIcon());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode){
+            case 0:
+                if (resultCode==RESULT_OK)
+                {
+                    String cityId = data.getExtras().getString("cityId");
+                    Log.d("cityId",cityId);
+                    String WEATHER_URL = "https://api.heweather.com/x3/weather?cityid="+cityId+"&key=9c121f3f984f4dde86917788a38b9956";
+                }
+                break;
+                default:
+                    break;
+        }
     }
 
     @Override
@@ -165,7 +212,9 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, SearchableActivity.class);
                 Log.d(TAG, db.getCityNum(null) + "");
                 if (db.getCityNum(null) < 1) {
-                    saveInDb(intent);
+                    saveCityInDb(intent);
+                } else {
+                    startActivityForResult(intent,0);
                 }
 
                 return false;

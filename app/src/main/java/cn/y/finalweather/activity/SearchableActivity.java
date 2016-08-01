@@ -3,6 +3,7 @@ package cn.y.finalweather.activity;
 import android.annotation.TargetApi;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.v4.view.MenuItemCompat;
@@ -82,10 +83,14 @@ public class SearchableActivity extends AppCompatActivity {
 //                Log.d(TAG, "Xs: " + pointStart.x + "\nXe: " + pointEnd.x);
                 if (Math.abs(pointStart.x - pointEnd.x) < 2 && Math.abs(pointStart.y - pointEnd.y) < 2) {
                     View v = rv.findChildViewUnder(e.getX(), e.getY());
-                    int postrion = rv.getChildLayoutPosition(v);
+                    int position = rv.getChildLayoutPosition(v);
 //                    Log.d(TAG, rv.getChildLayoutPosition(v) + "");
-                    String cityId = cityList.get(postrion).getId();
+                    String cityId = cityList.get(position).getId();
+                    Intent intent = new Intent();
+                    intent.putExtra("cityId",cityId);
+                    setResult(RESULT_OK,intent);
                     Log.d(TAG,cityId);
+                    finish();
                 }
                 return false;
             }

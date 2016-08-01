@@ -23,6 +23,12 @@ public class FinalWeatherOpenHelper extends SQLiteOpenHelper {
             "lon text," +
             "prov text," +
             "lat text)";
+    public static final String CREATE_CONDITION = "create table Condition(" +
+            "id integer primary key autoincrement," +
+            "code text," +
+            "txt text," +
+            "txt_en text," +
+            "icon text)" ;
 
     public FinalWeatherOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -31,10 +37,15 @@ public class FinalWeatherOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_CITY);
+        sqLiteDatabase.execSQL(CREATE_CONDITION);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        switch (i){
+            case 1:
+                sqLiteDatabase.execSQL(CREATE_CONDITION);
+                default:
+        }
     }
 }

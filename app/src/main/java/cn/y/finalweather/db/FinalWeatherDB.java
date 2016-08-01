@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.y.finalweather.model.City;
+import cn.y.finalweather.model.Condition;
 
 /**
  * 版权：版权所有(c) 2016
@@ -22,7 +23,7 @@ import cn.y.finalweather.model.City;
  */
 public class FinalWeatherDB {
     public static final String DB_NAME = "final_weather.db";
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static FinalWeatherDB finalWeatherDB;
     private SQLiteDatabase db;
 
@@ -38,36 +39,69 @@ public class FinalWeatherDB {
     }
 
     public void saveCity(City city) {
-        if (city != null){
+        if (city != null) {
             ContentValues values = new ContentValues();
-            values.put("cityCode",city.getId());
-            values.put("cityName",city.getCity());
-            values.put("cnty",city.getCnty());
-            values.put("lat",city.getLat());
-            values.put("lon",city.getLon());
-            values.put("prov",city.getProv());
-            db.insert("City",null,values);
+            values.put("cityCode", city.getId());
+            values.put("cityName", city.getCity());
+            values.put("cnty", city.getCnty());
+            values.put("lat", city.getLat());
+            values.put("lon", city.getLon());
+            values.put("prov", city.getProv());
+            db.insert("City", null, values);
         }
     }
 
-    public int getCityNum(String queryText){
+    public void saveCondition(Condition condition) {
+        if (condition != null) {
+            ContentValues values = new ContentValues();
+            values.put("code", condition.getCode());
+            values.put("icon", condition.getIcon());
+            values.put("txt", condition.getTxt());
+            values.put("txt_en", condition.getTxt_en());
+            db.insert("Condition", null, values);
+        }
+    }
+
+    public List<Condition> getCondition(String[] codeANDtxt) {
+        List<Condition> conditions = new ArrayList<>();
+        Cursor cursor;
+        if (codeANDtxt.length == 2)
+            cursor = db.query("Condition", null, "code = ? and txt = ?", codeANDtxt, null, null, null);
+        else
+            cursor = db.query("Condition", null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Condition condition = new Condition();
+                condition.setCode(cursor.getInt(cursor.getColumnIndex("code")));
+                condition.setIcon(cursor.getString(cursor.getColumnIndex("icon")));
+                condition.setTxt(cursor.getString(cursor.getColumnIndex("txt")));
+                condition.setTxt_en(cursor.getString(cursor.getColumnIndex("txt_en")));
+                condition.setId(cursor.getString(cursor.getColumnIndex("id")));
+                conditions.add(condition);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return conditions;
+    }
+
+    public int getCityNum(String queryText) {
         String selection = null;
-        if (queryText!=null)
-            selection =  "cityName LIKE '%" + queryText + "%' ";
-        Cursor cursor = db.query("City",null,selection,null,null,null,null);
+        if (queryText != null)
+            selection = "cityName LIKE '%" + queryText + "%' ";
+        Cursor cursor = db.query("City", null, selection, null, null, null, null);
         int count = cursor.getCount();
 //        Log.d("getCityNum",cursor.getCount()+"");
         cursor.close();
         return count;
     }
 
-    public List<City> loadCities(String queryText){
+    public List<City> loadCities(String queryText) {
         String selection = null;
-        if (queryText!=null)
-            selection =  "cityName LIKE '%" + queryText + "%' ";
+        if (queryText != null)
+            selection = "cityName LIKE '%" + queryText + "%' ";
         List<City> cities = new ArrayList<>();
-        Cursor cursor = db.query("City",null,selection,null,null,null,null);
-        if (cursor.moveToFirst()){
+        Cursor cursor = db.query("City", null, selection, null, null, null, null);
+        if (cursor.moveToFirst()) {
             do {
                 City city = new City();
                 city.setCity(cursor.getString(cursor.getColumnIndex("cityName")));
@@ -78,40 +112,55 @@ public class FinalWeatherDB {
                 city.setProv(cursor.getString(cursor.getColumnIndex("prov")));
                 city.setCustomId(cursor.getInt(cursor.getColumnIndex("id")));
                 cities.add(city);
-            }while (cursor.moveToNext());
+            } while (cursor.moveToNext());
         }
         cursor.close();
         return cities;
     }
 
-    public void updateDB(City city,String id){
-        if (city != null){
+    public void updateCityDB(City city, String id) {
+        if (city != null) {
             ContentValues values = new ContentValues();
-            values.put("cityCode",city.getId());
-            values.put("cityName",city.getCity());
-            values.put("cnty",city.getCnty());
-            values.put("lat",city.getLat());
-            values.put("lon",city.getLon());
-            values.put("prov",city.getProv());
-            db.update("City",values,"id = ?",new String[]{id});
+            values.put("cityCode", city.getId());
+            values.put("cityName", city.getCity());
+            values.put("cnty", city.getCnty());
+            values.put("lat", city.getLat());
+            values.put("lon", city.getLon());
+            values.put("prov", city.getProv());
+            db.update("City", values, "id = ?", new String[]{id});
+        }
+    }
+    public void updateConditionDB(Condition condition, String id) {
+        if (condition != null) {
+            ContentValues values = new ContentValues();
+            values.put("code", condition.getCode());
+            values.put("icon", condition.getIcon());
+            values.put("txt", condition.getTxt());
+            values.put("txt_en", condition.getTxt_en());
+            db.update("Condition", values, "id = ?", new String[]{id});
         }
     }
 
-    public void asynLoadCities(String queryText,CityLoadedCallBack cityLoadedCallBack){
+    public void asynLoadCities(String queryText, CityLoadedCallBack cityLoadedCallBack) {
         new LoadTask(cityLoadedCallBack).execute(queryText);
 
     }
-    public static abstract class CityLoadedCallBack{
-        public abstract  void onCityLoadStart();
+
+    public static abstract class CityLoadedCallBack {
+        public abstract void onCityLoadStart();
+
         public abstract void onCityLoaded(List<City> cities);
-        public abstract void onCityLoading(Integer now,Integer max);
+
+        public abstract void onCityLoading(Integer now, Integer max);
     }
 
-    public class LoadTask extends AsyncTask<String,Integer,List<City>>{
+    public class LoadTask extends AsyncTask<String, Integer, List<City>> {
         private CityLoadedCallBack cityLoadedCallBack;
-        public LoadTask(CityLoadedCallBack cityLoadedCallBack){
+
+        public LoadTask(CityLoadedCallBack cityLoadedCallBack) {
             this.cityLoadedCallBack = cityLoadedCallBack;
         }
+
         @Override
         protected void onPreExecute() {
             cityLoadedCallBack.onCityLoadStart();
@@ -121,11 +170,11 @@ public class FinalWeatherDB {
         protected List<City> doInBackground(String... strings) {
             String queryText = strings[0];
             String selection = null;
-            if (queryText!=null)
-                selection =  "cityName LIKE '%" + queryText + "%' ";
+            if (queryText != null)
+                selection = "cityName LIKE '%" + queryText + "%' ";
             List<City> cities = new ArrayList<>();
-            Cursor cursor = db.query("City",null,selection,null,null,null,null);
-            if (cursor.moveToFirst()){
+            Cursor cursor = db.query("City", null, selection, null, null, null, null);
+            if (cursor.moveToFirst()) {
                 do {
                     City city = new City();
                     city.setCity(cursor.getString(cursor.getColumnIndex("cityName")));
@@ -136,8 +185,8 @@ public class FinalWeatherDB {
                     city.setProv(cursor.getString(cursor.getColumnIndex("prov")));
                     city.setCustomId(cursor.getInt(cursor.getColumnIndex("id")));
                     cities.add(city);
-                    publishProgress(cursor.getPosition(),cursor.getColumnCount());
-                }while (cursor.moveToNext());
+                    publishProgress(cursor.getPosition(), cursor.getColumnCount());
+                } while (cursor.moveToNext());
             }
             cursor.close();
             return cities;
@@ -145,7 +194,7 @@ public class FinalWeatherDB {
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            cityLoadedCallBack.onCityLoading(values[0],values[1]);
+            cityLoadedCallBack.onCityLoading(values[0], values[1]);
             super.onProgressUpdate(values);
         }
 
