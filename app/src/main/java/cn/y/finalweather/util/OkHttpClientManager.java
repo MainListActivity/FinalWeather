@@ -597,8 +597,8 @@ public class OkHttpClientManager
                     } else
                     {
                         Object o;
-                        Log.d(TAG,response.body().contentLength()+"");
-                        Log.d(TAG,string.length()+"");
+//                        Log.d(TAG,response.body().contentLength()+"");
+//                        Log.d(TAG,string.length()+"");
 //                        if(response.body().contentLength() > 1000000){
 //
 //                            o = mGson.fromJson(jsonReader, callback.mType);

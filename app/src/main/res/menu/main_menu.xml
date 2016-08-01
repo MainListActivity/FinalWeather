@@ -3,7 +3,7 @@
     xmlns:finalweather="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_search_category_default"
+        android:icon="@android:drawable/ic_menu_search"
         android:title="@string/action_search"
         finalweather:actionViewClass="android.support.v7.widget.SearchView"
         finalweather:showAsAction="ifRoom|collapseActionView" />

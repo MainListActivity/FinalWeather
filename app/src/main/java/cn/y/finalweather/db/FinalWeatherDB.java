@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +50,23 @@ public class FinalWeatherDB {
         }
     }
 
-    public List<City> loadCities(){
+    public int getCityNum(String queryText){
+        String selection = null;
+        if (queryText!=null)
+            selection =  "cityName LIKE '%" + queryText + "%' ";
+        Cursor cursor = db.query("City",null,selection,null,null,null,null);
+        int count = cursor.getCount();
+//        Log.d("getCityNum",cursor.getCount()+"");
+        cursor.close();
+        return count;
+    }
+
+    public List<City> loadCities(String queryText){
+        String selection = null;
+        if (queryText!=null)
+            selection =  "cityName LIKE '%" + queryText + "%' ";
         List<City> cities = new ArrayList<>();
-        Cursor cursor = db.query("City",null,null,null,null,null,null);
+        Cursor cursor = db.query("City",null,selection,null,null,null,null);
         if (cursor.moveToFirst()){
             do {
                 City city = new City();
@@ -67,6 +83,7 @@ public class FinalWeatherDB {
         cursor.close();
         return cities;
     }
+
     public void updateDB(City city,String id){
         if (city != null){
             ContentValues values = new ContentValues();
@@ -77,6 +94,65 @@ public class FinalWeatherDB {
             values.put("lon",city.getLon());
             values.put("prov",city.getProv());
             db.update("City",values,"id = ?",new String[]{id});
+        }
+    }
+
+    public void asynLoadCities(String queryText,CityLoadedCallBack cityLoadedCallBack){
+        new LoadTask(cityLoadedCallBack).execute(queryText);
+
+    }
+    public static abstract class CityLoadedCallBack{
+        public abstract  void onCityLoadStart();
+        public abstract void onCityLoaded(List<City> cities);
+        public abstract void onCityLoading(Integer now,Integer max);
+    }
+
+    public class LoadTask extends AsyncTask<String,Integer,List<City>>{
+        private CityLoadedCallBack cityLoadedCallBack;
+        public LoadTask(CityLoadedCallBack cityLoadedCallBack){
+            this.cityLoadedCallBack = cityLoadedCallBack;
+        }
+        @Override
+        protected void onPreExecute() {
+            cityLoadedCallBack.onCityLoadStart();
+        }
+
+        @Override
+        protected List<City> doInBackground(String... strings) {
+            String queryText = strings[0];
+            String selection = null;
+            if (queryText!=null)
+                selection =  "cityName LIKE '%" + queryText + "%' ";
+            List<City> cities = new ArrayList<>();
+            Cursor cursor = db.query("City",null,selection,null,null,null,null);
+            if (cursor.moveToFirst()){
+                do {
+                    City city = new City();
+                    city.setCity(cursor.getString(cursor.getColumnIndex("cityName")));
+                    city.setId(cursor.getString(cursor.getColumnIndex("cityCode")));
+                    city.setCnty(cursor.getString(cursor.getColumnIndex("cnty")));
+                    city.setLat(cursor.getFloat(cursor.getColumnIndex("lat")));
+                    city.setLon(cursor.getFloat(cursor.getColumnIndex("lon")));
+                    city.setProv(cursor.getString(cursor.getColumnIndex("prov")));
+                    city.setCustomId(cursor.getInt(cursor.getColumnIndex("id")));
+                    cities.add(city);
+                    publishProgress(cursor.getPosition(),cursor.getColumnCount());
+                }while (cursor.moveToNext());
+            }
+            cursor.close();
+            return cities;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            cityLoadedCallBack.onCityLoading(values[0],values[1]);
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(List<City> cities) {
+            cityLoadedCallBack.onCityLoaded(cities);
+            super.onPostExecute(cities);
         }
     }
 }

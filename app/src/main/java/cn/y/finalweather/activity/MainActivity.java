@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -46,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView tv;
     private ProgressDialog progressDialog;
     private ProgressDialog progressDialog1;
-    private ActionBar LocalActionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     case MSG_PROGRESS_CHANGED:
                         progressDialog1.show();
                         progressDialog1.setProgress(msg.arg1);//size = 53039
-                        if(msg.arg1 >= msg.arg2 - 1)
+                        if (msg.arg1 >= msg.arg2 - 1)
                             progressDialog1.dismiss();
                         break;
                     default:
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 //        tv.setText(cities.get(0).getCity()+"\n"+cities.get(1).getCity());
     }
 
-    private void saveInDb() {
+    private void saveInDb(final Intent intent) {
         progressDialog = ProgressDialog.show(MainActivity.this, TAG, "网络访问中。。。。");
 //        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
         OkHttpClientManager.getAsyn(FULL_CITY_URL, new OkHttpClientManager.ResultCallback<CityInfo>() {
@@ -105,42 +106,46 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(CityInfo response) {
 //                progressDialog.dismiss();
                 final List<City> cities = response.getCity_info();
-                final List<City> cities1 = db.loadCities();
-
-                new Thread() {
-                    @Override
-                    public void run() {
-                        Message msg = new Message();
-                        msg.what = MSG_NET_CON;
-                        msg.arg1 = cities.size();
-                        handler.sendMessage(msg);
-                        for (City city : cities) {
-                            Message msg1 = new Message();
-                            msg1.what = MSG_PROGRESS_CHANGED;
-                            msg1.arg1 = cities.indexOf(city);
-                            msg1.arg2 = cities.size();
-                            handler.sendMessage(msg1);
-                            if (cities1.size() > cities.indexOf(city)) {
-                                Log.d(TAG, cities1.get(cities.indexOf(city)).getCity() + ",读出：" + cities1.get(cities.indexOf(city)).getId());
-                                if (!city.getId().equals(cities1.get(cities.indexOf(city)).getId())) {
-                                    db.updateDB(city, (cities.indexOf(city) + 1) + "");
+                final List<City> cities1 = db.loadCities(null);
+                if (cities != cities1) {
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            Message msg = new Message();
+                            msg.what = MSG_NET_CON;
+                            msg.arg1 = cities.size();
+                            handler.sendMessage(msg);
+                            for (City city : cities) {
+                                Message msg1 = new Message();
+                                msg1.what = MSG_PROGRESS_CHANGED;
+                                msg1.arg1 = cities.indexOf(city);
+                                msg1.arg2 = cities.size();
+                                handler.sendMessage(msg1);
+                                if (cities1.size() > cities.indexOf(city)) {
+                                    Log.d(TAG, cities1.get(cities.indexOf(city)).getCity() + ",读出：" + cities1.get(cities.indexOf(city)).getId());
+                                    if (!city.getId().equals(cities1.get(cities.indexOf(city)).getId())) {
+                                        db.updateDB(city, (cities.indexOf(city) + 1) + "");
+                                    }
+                                } else {
+                                    db.saveCity(city);
+                                    Log.d(TAG, city.getCity() + ",已存入数据库：" + city.getId());
                                 }
-                            } else {
-                                db.saveCity(city);
-                                Log.d(TAG, city.getCity() + ",已存入数据库：" + city.getId());
-                            }
 //                    progressDialog.setProgress(cities.indexOf(city));
 //                    db.saveCity(city);
+                            }
+                            Log.d(TAG, "全部已存入数据库!");
+                            if (intent != null)
+                                startActivity(intent);
                         }
-                        Log.d(TAG, "全部已存入数据库!");
-                    }
 
 
-                }.start();
+                    }.start();
+                }
 //                progressDialog.dismiss();
             }
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the options menu from XML
@@ -153,7 +158,24 @@ public class MainActivity extends AppCompatActivity {
         // Assumes current activity is the searchable activity
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+//        searchView.setBackgroundColor(0xff000000);
+        MenuItemCompat.setOnActionExpandListener(menu.findItem(R.id.action_search), new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Intent intent = new Intent(MainActivity.this, SearchableActivity.class);
+                Log.d(TAG, db.getCityNum(null) + "");
+                if (db.getCityNum(null) < 1) {
+                    saveInDb(intent);
+                }
 
+                return false;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                return false;
+            }
+        });
         return true;
     }
 
