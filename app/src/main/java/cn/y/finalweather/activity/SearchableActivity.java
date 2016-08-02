@@ -7,8 +7,10 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -28,6 +30,7 @@ import cn.y.finalweather.R;
 import cn.y.finalweather.adapter.RecyclerAdapter;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.City;
+import cn.y.finalweather.util.DividerItemDecoration;
 
 public class SearchableActivity extends AppCompatActivity {
 
@@ -40,6 +43,7 @@ public class SearchableActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private Point pointStart = new Point();
     private Point pointEnd = new Point();
+
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
@@ -57,6 +61,8 @@ public class SearchableActivity extends AppCompatActivity {
         layoutManager.setOrientation(OrientationHelper.VERTICAL);
         //设置增加或删除条目的动画
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        //添加分割线
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, layoutManager.getOrientation()));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -87,9 +93,9 @@ public class SearchableActivity extends AppCompatActivity {
 //                    Log.d(TAG, rv.getChildLayoutPosition(v) + "");
                     String cityId = cityList.get(position).getId();
                     Intent intent = new Intent();
-                    intent.putExtra("cityId",cityId);
-                    setResult(RESULT_OK,intent);
-                    Log.d(TAG,cityId);
+                    intent.putExtra("cityId", cityId);
+                    setResult(RESULT_OK, intent);
+                    Log.d(TAG, cityId);
                     finish();
                 }
                 return false;
@@ -185,4 +191,6 @@ public class SearchableActivity extends AppCompatActivity {
             searchView.clearFocus();
         }
     }
+
+
 }

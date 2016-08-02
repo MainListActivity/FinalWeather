@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,11 +17,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Request;
 
 import java.util.List;
@@ -42,7 +40,7 @@ import cn.y.finalweather.util.OkHttpClientManager;
  * 城市天气接口： https://api.heweather.com/x3/weather?cityid=城市ID&key=你的认证key
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener{
 
     public static final String FULL_CITY_URL = "https://api.heweather.com/x3/citylist?search=allworld&key=9c121f3f984f4dde86917788a38b9956";
     private String CONDITION_URL = "https://api.heweather.com/x3/condition?search=allcond&key=9c121f3f984f4dde86917788a38b9956";
@@ -55,14 +53,29 @@ public class MainActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
     private ProgressDialog progressDialog1;
     private HeWeather weather;
+    private ActionBar actionBar;
+    private SwipeRefreshLayout srl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         tv = (TextView) findViewById(R.id.tv);
+        srl= (SwipeRefreshLayout) findViewById(R.id.srl);
+        srl.setColorSchemeResources(android.R.color.holo_orange_dark, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
+        srl.setOnRefreshListener(this);
         db = FinalWeatherDB.getFinalWeatherDB(MainActivity.this);
         progressDialog1 = new ProgressDialog(MainActivity.this);
+        actionBar = getSupportActionBar();
+        SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
+        HeWeather weather = db.getWeather(sp);
+        if (weather.getBasic().getCity()!=null) {
+            actionBar.setTitle(weather.getBasic().getCity());
+        }else {
+            saveConditionInDb();
+            Intent intent = new Intent(this,SearchableActivity.class);
+            saveCityInDb(intent);
+        }
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -85,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-        saveConditionInDb();
         //saveInDb();
 
 
@@ -256,6 +268,8 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Map<String, List<HeWeather>> response) {
                 if (response != null) {
                     HeWeather heWeather = response.get("HeWeather data service 3.0").get(0);
+                    String city = heWeather.getBasic().getCity();
+                    actionBar.setTitle(city);
                     SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
                     db.saveWeather(heWeather, sp, false);
                     //TODO:将Weather对象加到UI中
@@ -270,5 +284,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public void onRefresh() {
+        new Handler() .postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 停止刷新
+                srl.setRefreshing(false);
+            }
+        }, 5000); // 5秒后发送消息，停止刷新
     }
 }

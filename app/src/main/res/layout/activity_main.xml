@@ -9,13 +9,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".activity.MainActivity">
 
-    <ScrollView
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/srl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
-    </ScrollView>
+
+        <TextView
+            android:id="@+id/tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello World!" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

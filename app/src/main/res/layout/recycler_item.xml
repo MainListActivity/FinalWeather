@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<cn.y.finalweather.bamUi.BamLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll"
+    android:background="#66e7ac0b"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -9,4 +11,4 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center" />
-</LinearLayout>
+</cn.y.finalweather.bamUi.BamLinearLayout>
