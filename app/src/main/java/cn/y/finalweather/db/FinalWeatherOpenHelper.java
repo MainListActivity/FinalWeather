@@ -28,7 +28,38 @@ public class FinalWeatherOpenHelper extends SQLiteOpenHelper {
             "code text," +
             "txt text," +
             "txt_en text," +
-            "icon text)" ;
+            "icon text)";
+    public static final String CREATE_DAILY_FORECAST = "create table daily_forecast(" +
+            "id integer primary key autoincrement," +
+            "sr text," +
+            "ss text," +
+            "code_d text," +
+            "code_n text," +
+            "txt_d text," +
+            "txt_n text," +
+            "date text," +
+            "hum text," +
+            "pcpn text," +
+            "pop text," +
+            "pres text," +
+            "max text," +
+            "min text," +
+            "vis text," +
+            "deg text," +
+            "dir text," +
+            "sc text," +
+            "spd text)";
+    public static final String CREATE_HOURLY_FORECAST = "create table hourly_forecast(" +
+            "id integer primary key autoincrement," +
+            "date text," +
+            "hum text," +
+            "pop text," +
+            "pres text," +
+            "tmp text," +
+            "deg text," +
+            "dir text," +
+            "sc text," +
+            "spd text)";
 
     public FinalWeatherOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -38,14 +69,19 @@ public class FinalWeatherOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_CITY);
         sqLiteDatabase.execSQL(CREATE_CONDITION);
+        sqLiteDatabase.execSQL(CREATE_DAILY_FORECAST);
+        sqLiteDatabase.execSQL(CREATE_HOURLY_FORECAST);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        switch (i){
+        switch (i) {
             case 1:
                 sqLiteDatabase.execSQL(CREATE_CONDITION);
-                default:
+            case 2:
+                sqLiteDatabase.execSQL(CREATE_DAILY_FORECAST);
+                sqLiteDatabase.execSQL(CREATE_HOURLY_FORECAST);
+            default:
         }
     }
 }

@@ -12,10 +12,10 @@ public class City {
     private String city;
     private String cnty;
     private String id;
-    private float lat;
-    private float lon;
+    private String lat;
+    private String lon;
     private String prov;
-    private int customId;
+    private String customId;
 
     public String getCity() {
         return city;
@@ -29,11 +29,11 @@ public class City {
         return cnty;
     }
 
-    public float getLat() {
+    public String getLat() {
         return lat;
     }
 
-    public float getLon() {
+    public String getLon() {
         return lon;
     }
 
@@ -41,7 +41,7 @@ public class City {
         return prov;
     }
 
-    public int getCustomId() {
+    public String getCustomId() {
         return customId;
     }
 
@@ -57,11 +57,11 @@ public class City {
         this.cnty = cnty;
     }
 
-    public void setLat(float lat) {
+    public void setLat(String lat) {
         this.lat = lat;
     }
 
-    public void setLon(float lon) {
+    public void setLon(String lon) {
         this.lon = lon;
     }
 
@@ -69,7 +69,7 @@ public class City {
         this.prov = prov;
     }
 
-    public void setCustomId(int customId) {
+    public void setCustomId(String customId) {
         this.customId = customId;
     }
 }

@@ -1,5 +1,6 @@
 package cn.y.finalweather.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ import java.util.List;
 public class HeWeather {
     private Basic basic;
     private List<DailyForecast> daily_forecast;
-    private List<HourlyForecast>  hourly_forecast;
+    private List<HourlyForecast> hourly_forecast;
     private Now now;
     private String status;
     private Suggestion suggestion;
@@ -26,23 +27,39 @@ public class HeWeather {
     }
 
     public Basic getBasic() {
-        return basic;
+        if (basic == null)
+            return new Basic();
+        else
+            return basic;
     }
 
     public List<DailyForecast> getDaily_forecast() {
-        return daily_forecast;
+        return daily_forecast == null ? new ArrayList<DailyForecast>(10) : daily_forecast;
+    }
+
+    public DailyForecast getDailyForecast(){
+        return new DailyForecast();
+    }
+    public HourlyForecast getHourlyForecast(){
+        return new HourlyForecast();
     }
 
     public List<HourlyForecast> getHourly_forecast() {
-        return hourly_forecast;
+        return hourly_forecast == null ? new ArrayList<HourlyForecast>(10) : hourly_forecast;
     }
 
     public Now getNow() {
-        return now;
+        if (now == null)
+            return new Now();
+        else
+            return now;
     }
 
     public Suggestion getSuggestion() {
-        return suggestion;
+        if (suggestion == null)
+            return new Suggestion();
+        else
+            return suggestion;
     }
 
     public void setStatus(String status) {
@@ -69,19 +86,19 @@ public class HeWeather {
         this.suggestion = suggestion;
     }
 
-    public class Basic{
+    public class Basic {
         private String city;
         private String cnty;
         private String id;
-        private float lat;
-        private float lon;
+        private String lat;
+        private String lon;
         private Update update;
 
-        public float getLat() {
+        public String getLat() {
             return lat;
         }
 
-        public float getLon() {
+        public String getLon() {
             return lon;
         }
 
@@ -98,7 +115,10 @@ public class HeWeather {
         }
 
         public Update getUpdate() {
-            return update;
+            if (update == null)
+                return new Update();
+            else
+                return update;
         }
 
         public void setCity(String city) {
@@ -113,11 +133,11 @@ public class HeWeather {
             this.id = id;
         }
 
-        public void setLat(float lat) {
+        public void setLat(String lat) {
             this.lat = lat;
         }
 
-        public void setLon(float lon) {
+        public void setLon(String lon) {
             this.lon = lon;
         }
 
@@ -126,7 +146,7 @@ public class HeWeather {
         }
 
 
-        public class Update{
+        public class Update {
             private String loc;
             private String utc;
 
@@ -147,43 +167,45 @@ public class HeWeather {
             }
         }
     }
-    public class DailyForecast{
+
+    public class DailyForecast {
         private Astro astro;
         private Cond cond;
         private String date;
-        private int hum;
-        private double pcpn;
-        private int pop;
-        private int pres;
+        private String hum;
+        private String pcpn;
+        private String pop;
+        private String pres;
         private Tmp tmp;
-        private int vis;
+        private String vis;
         private Wind wind;
 
         public Astro getAstro() {
-            return astro;
+
+            return astro == null ? new Astro() : astro;
         }
 
         public Cond getCond() {
-            return cond;
+            return cond == null ? new Cond() : cond;
         }
 
-        public double getPcpn() {
+        public String getPcpn() {
             return pcpn;
         }
 
-        public int getHum() {
+        public String getHum() {
             return hum;
         }
 
-        public int getPop() {
+        public String getPop() {
             return pop;
         }
 
-        public int getPres() {
+        public String getPres() {
             return pres;
         }
 
-        public int getVis() {
+        public String getVis() {
             return vis;
         }
 
@@ -192,11 +214,11 @@ public class HeWeather {
         }
 
         public Tmp getTmp() {
-            return tmp;
+            return tmp == null ? new Tmp() : tmp;
         }
 
         public Wind getWind() {
-            return wind;
+            return wind == null ? new Wind() : wind;
         }
 
         public void setAstro(Astro astro) {
@@ -211,19 +233,19 @@ public class HeWeather {
             this.date = date;
         }
 
-        public void setHum(int hum) {
+        public void setHum(String hum) {
             this.hum = hum;
         }
 
-        public void setPcpn(double pcpn) {
+        public void setPcpn(String pcpn) {
             this.pcpn = pcpn;
         }
 
-        public void setPop(int pop) {
+        public void setPop(String pop) {
             this.pop = pop;
         }
 
-        public void setPres(int pres) {
+        public void setPres(String pres) {
             this.pres = pres;
         }
 
@@ -231,7 +253,7 @@ public class HeWeather {
             this.tmp = tmp;
         }
 
-        public void setVis(int vis) {
+        public void setVis(String vis) {
             this.vis = vis;
         }
 
@@ -240,7 +262,7 @@ public class HeWeather {
         }
 
 
-        public class Astro{
+        public class Astro {
             private String sr;
             private String ss;
 
@@ -260,17 +282,18 @@ public class HeWeather {
                 this.ss = ss;
             }
         }
-        public class Cond{
-            private int code_d;
-            private int code_n;
+
+        public class Cond {
+            private String code_d;
+            private String code_n;
             private String txt_d;
             private String txt_n;
 
-            public int getCode_d() {
+            public String getCode_d() {
                 return code_d;
             }
 
-            public int getCode_n() {
+            public String getCode_n() {
                 return code_n;
             }
 
@@ -282,11 +305,11 @@ public class HeWeather {
                 return txt_n;
             }
 
-            public void setCode_d(int code_d) {
+            public void setCode_d(String code_d) {
                 this.code_d = code_d;
             }
 
-            public void setCode_n(int code_n) {
+            public void setCode_n(String code_n) {
                 this.code_n = code_n;
             }
 
@@ -298,37 +321,39 @@ public class HeWeather {
                 this.txt_n = txt_n;
             }
         }
-        public class Tmp{
-            private int max;
-            private int min;
 
-            public int getMax() {
+        public class Tmp {
+            private String max;
+            private String min;
+
+            public String getMax() {
                 return max;
             }
 
-            public int getMin() {
+            public String getMin() {
                 return min;
             }
 
-            public void setMax(int max) {
+            public void setMax(String max) {
                 this.max = max;
             }
 
-            public void setMin(int min) {
+            public void setMin(String min) {
                 this.min = min;
             }
         }
-        private class Wind{
-            private int deg;
-            private String dir;
-            private String sr;
-            private int spd;
 
-            public int getDeg() {
+        public class Wind {
+            private String deg;
+            private String dir;
+            private String sc;
+            private String spd;
+
+            public String getDeg() {
                 return deg;
             }
 
-            public int getSpd() {
+            public String getSpd() {
                 return spd;
             }
 
@@ -336,11 +361,11 @@ public class HeWeather {
                 return dir;
             }
 
-            public String getSr() {
-                return sr;
+            public String getSc() {
+                return sc;
             }
 
-            public void setDeg(int deg) {
+            public void setDeg(String deg) {
                 this.deg = deg;
             }
 
@@ -348,37 +373,38 @@ public class HeWeather {
                 this.dir = dir;
             }
 
-            public void setSpd(int spd) {
+            public void setSpd(String spd) {
                 this.spd = spd;
             }
 
-            public void setSr(String sr) {
-                this.sr = sr;
+            public void setSc(String sc) {
+                this.sc = sc;
             }
         }
 
     }
-    public class HourlyForecast{
+
+    public class HourlyForecast {
         private String date;
-        private int hum;
-        private int pop;
-        private int pres;
-        private int tmp;
+        private String hum;
+        private String pop;
+        private String pres;
+        private String tmp;
         private DailyForecast.Wind wind;
 
-        public int getHum() {
+        public String getHum() {
             return hum;
         }
 
-        public int getPop() {
+        public String getPop() {
             return pop;
         }
 
-        public int getPres() {
+        public String getPres() {
             return pres;
         }
 
-        public int getTmp() {
+        public String getTmp() {
             return tmp;
         }
 
@@ -387,26 +413,26 @@ public class HeWeather {
         }
 
         public DailyForecast.Wind getWind() {
-            return wind;
+            return wind == null ? new DailyForecast().getWind() : wind;
         }
 
         public void setDate(String date) {
             this.date = date;
         }
 
-        public void setHum(int hum) {
+        public void setHum(String hum) {
             this.hum = hum;
         }
 
-        public void setPop(int pop) {
+        public void setPop(String pop) {
             this.pop = pop;
         }
 
-        public void setPres(int pres) {
+        public void setPres(String pres) {
             this.pres = pres;
         }
 
-        public void setTmp(int tmp) {
+        public void setTmp(String tmp) {
             this.tmp = tmp;
         }
 
@@ -415,45 +441,52 @@ public class HeWeather {
         }
 
     }
-    public class Now{
+
+    public class Now {
         private Cond cond;
-        private int fl;
-        private int hum;
-        private int pcpn;
-        private int pres;
-        private int tmp;
+        private String fl;
+        private String hum;
+        private String pcpn;
+        private String pres;
+        private String tmp;
         private DailyForecast.Wind wind;
-        private int vis;
+        private String vis;
 
         public DailyForecast.Wind getWind() {
-            return wind;
+            if (wind == null)
+                return new DailyForecast().getWind();
+            else
+                return wind;
         }
 
-        public int getTmp() {
+        public String getTmp() {
             return tmp;
         }
 
-        public int getPres() {
+        public String getPres() {
             return pres;
         }
 
         public Cond getCond() {
-            return cond;
+            if (cond == null)
+                return new Cond();
+            else
+                return cond;
         }
 
-        public int getFl() {
+        public String getFl() {
             return fl;
         }
 
-        public int getHum() {
+        public String getHum() {
             return hum;
         }
 
-        public int getPcpn() {
+        public String getPcpn() {
             return pcpn;
         }
 
-        public int getVis() {
+        public String getVis() {
             return vis;
         }
 
@@ -461,11 +494,11 @@ public class HeWeather {
             this.wind = wind;
         }
 
-        public void setTmp(int tmp) {
+        public void setTmp(String tmp) {
             this.tmp = tmp;
         }
 
-        public void setPres(int pres) {
+        public void setPres(String pres) {
             this.pres = pres;
         }
 
@@ -473,27 +506,27 @@ public class HeWeather {
             this.cond = cond;
         }
 
-        public void setFl(int fl) {
+        public void setFl(String fl) {
             this.fl = fl;
         }
 
-        public void setHum(int hum) {
+        public void setHum(String hum) {
             this.hum = hum;
         }
 
-        public void setPcpn(int pcpn) {
+        public void setPcpn(String pcpn) {
             this.pcpn = pcpn;
         }
 
-        public void setVis(int vis) {
+        public void setVis(String vis) {
             this.vis = vis;
         }
 
-        public class Cond{
-            private int code;
+        public class Cond {
+            private String code;
             private String txt;
 
-            public int getCode() {
+            public String getCode() {
                 return code;
             }
 
@@ -501,7 +534,7 @@ public class HeWeather {
                 return txt;
             }
 
-            public void setCode(int code) {
+            public void setCode(String code) {
                 this.code = code;
             }
 
@@ -510,7 +543,8 @@ public class HeWeather {
             }
         }
     }
-    public class Suggestion{
+
+    public class Suggestion {
         private Comf comf;
         private Cw cw;
         private Drsg drsg;
@@ -520,31 +554,32 @@ public class HeWeather {
         private Uv uv;
 
         public Comf getComf() {
-            return comf;
+
+            return comf == null ? new Comf() : comf;
         }
 
         public Cw getCw() {
-            return cw;
+            return cw == null ? new Cw() : cw;
         }
 
         public Drsg getDrsg() {
-            return drsg;
+            return drsg == null ? new Drsg() : drsg;
         }
 
         public Flu getFlu() {
-            return flu;
+            return flu == null ? new Flu() : flu;
         }
 
         public Sport getSport() {
-            return sport;
+            return sport == null ? new Sport() : sport;
         }
 
         public Trav getTrav() {
-            return trav;
+            return trav == null ? new Trav() : trav;
         }
 
         public Uv getUv() {
-            return uv;
+            return uv == null ? new Uv() : uv;
         }
 
         public void setComf(Comf comf) {
@@ -575,7 +610,7 @@ public class HeWeather {
             this.uv = uv;
         }
 
-        public class Comf{
+        public class Comf {
             private String brf;
             private String txt;
 
@@ -595,9 +630,11 @@ public class HeWeather {
                 return txt;
             }
         }
-        public class Cw{
+
+        public class Cw {
             private String brf;
             private String txt;
+
             public void setBrf(String brf) {
                 this.brf = brf;
             }
@@ -614,9 +651,11 @@ public class HeWeather {
                 return txt;
             }
         }
-        public class Drsg{
+
+        public class Drsg {
             private String brf;
             private String txt;
+
             public void setBrf(String brf) {
                 this.brf = brf;
             }
@@ -633,9 +672,11 @@ public class HeWeather {
                 return txt;
             }
         }
-        public class Flu{
+
+        public class Flu {
             private String brf;
             private String txt;
+
             public void setBrf(String brf) {
                 this.brf = brf;
             }
@@ -652,9 +693,11 @@ public class HeWeather {
                 return txt;
             }
         }
-        public class Sport{
+
+        public class Sport {
             private String brf;
             private String txt;
+
             public void setBrf(String brf) {
                 this.brf = brf;
             }
@@ -671,9 +714,11 @@ public class HeWeather {
                 return txt;
             }
         }
-        public class Trav{
+
+        public class Trav {
             private String brf;
             private String txt;
+
             public void setBrf(String brf) {
                 this.brf = brf;
             }
@@ -690,9 +735,11 @@ public class HeWeather {
                 return txt;
             }
         }
-        public class Uv{
+
+        public class Uv {
             private String brf;
             private String txt;
+
             public void setBrf(String brf) {
                 this.brf = brf;
             }

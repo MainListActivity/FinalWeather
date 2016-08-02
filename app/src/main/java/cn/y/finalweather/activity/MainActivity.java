@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.MenuItemCompat;
@@ -19,9 +20,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.Request;
 
 import java.util.List;
+import java.util.Map;
 
 import cn.y.finalweather.R;
 import cn.y.finalweather.db.FinalWeatherDB;
@@ -29,6 +32,7 @@ import cn.y.finalweather.model.City;
 import cn.y.finalweather.model.CityInfo;
 import cn.y.finalweather.model.Condition;
 import cn.y.finalweather.model.ConditionInfo;
+import cn.y.finalweather.model.HeWeather;
 import cn.y.finalweather.util.OkHttpClientManager;
 
 /**
@@ -46,10 +50,11 @@ public class MainActivity extends AppCompatActivity {
     public static final int MSG_PROGRESS_CHANGED = 0x01;
     public static final String TAG = "MainActivity";
     private FinalWeatherDB db;
-    private Handler handler;
+    public static Handler handler;
     private TextView tv;
     private ProgressDialog progressDialog;
     private ProgressDialog progressDialog1;
+    private HeWeather weather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             Log.d(TAG, "全部已存入数据库!");
                             if (intent != null)
-                                startActivityForResult(intent,0);
+                                startActivityForResult(intent, 0);
                         }
 
 
@@ -179,17 +184,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case 0:
-                if (resultCode==RESULT_OK)
-                {
+                if (resultCode == RESULT_OK) {
                     String cityId = data.getExtras().getString("cityId");
-                    Log.d("cityId",cityId);
-                    String WEATHER_URL = "https://api.heweather.com/x3/weather?cityid="+cityId+"&key=9c121f3f984f4dde86917788a38b9956";
+//                    Log.d("cityId", cityId);
+                    if (cityId != null) {
+                        refreshWeather(cityId);
+                    }
                 }
                 break;
-                default:
-                    break;
+            default:
+                break;
         }
     }
 
@@ -214,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 if (db.getCityNum(null) < 1) {
                     saveCityInDb(intent);
                 } else {
-                    startActivityForResult(intent,0);
+                    startActivityForResult(intent, 0);
                 }
 
                 return false;
@@ -228,4 +234,41 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * 从网络获取天气数据，并更新本地数据
+     * @param cityId :如果传入一个cityId则从网络获取这个Id对应的天气数据，如果不传入则更新本地城市数据
+     */
+    private void refreshWeather(String cityId) {
+        weather = new HeWeather();
+        SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
+        HeWeather dbWeather = db.getWeather(sp);
+        String dbCityId = dbWeather.getBasic().getId();
+        cityId = cityId == null ? dbCityId : cityId;
+        Log.d("CityCum", cityId + "<----->" + dbCityId);
+        String WEATHER_URL = "https://api.heweather.com/x3/weather?cityid=" + cityId + "&key=9c121f3f984f4dde86917788a38b9956";
+        OkHttpClientManager.getAsyn(WEATHER_URL, new OkHttpClientManager.ResultCallback<Map<String, List<HeWeather>>>() {
+            @Override
+            public void onError(Request request, Exception e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Map<String, List<HeWeather>> response) {
+                if (response != null) {
+                    HeWeather heWeather = response.get("HeWeather data service 3.0").get(0);
+                    SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
+                    db.saveWeather(heWeather, sp, false);
+                    //TODO:将Weather对象加到UI中
+//                                    if (heWeather.getNow() != null) {
+//                                        Log.d("HeWeather", heWeather.getNow().getFl() + "");
+//                                    } else Log.d("HeWeather", "response.getNow()=null");
+//                                    if (heWeather.getStatus() != null) {
+//                                        Log.d("HeWeather", heWeather.getStatus() + "");
+//                                        tv.setText(heWeather.getStatus());
+//                                    } else Log.d("HeWeather", "response.getStatus()=null");
+                } else Log.d("HeWeather", "response=null");
+            }
+        });
+
+    }
 }

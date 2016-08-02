@@ -11,7 +11,7 @@ package cn.y.finalweather.model;
  * =============================================
  */
 public class Condition {
-    private int code;
+    private String code;
     private String txt;
     private String txt_en;
     private String icon;
@@ -21,7 +21,7 @@ public class Condition {
         return id;
     }
 
-    public int getCode() {
+    public String getCode() {
         return code;
     }
 
@@ -37,7 +37,7 @@ public class Condition {
         return txt_en;
     }
 
-    public void setCode(int code) {
+    public void setCode(String code) {
         this.code = code;
     }
 
