@@ -7,10 +7,8 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -27,7 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 import java.util.List;
 
 import cn.y.finalweather.R;
-import cn.y.finalweather.adapter.RecyclerAdapter;
+import cn.y.finalweather.adapter.CityRecyclerAdapter;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.City;
 import cn.y.finalweather.util.DividerItemDecoration;
@@ -114,7 +112,7 @@ public class SearchableActivity extends AppCompatActivity {
 //        cityList = db.loadCities(null);
 //        cityList = cityList.subList(0,100);
 //        Toast.makeText(this,cityList.size()+"",Toast.LENGTH_LONG).show();
-//        adapter  = new RecyclerAdapter(this,cityList);
+//        adapter  = new CityRecyclerAdapter(this,cityList);
         recyclerView.setHasFixedSize(true);//不加这句notifyDataSetChanged（）不工作
         //设置Adapter
 //        recyclerView.setAdapter(adapter);
@@ -157,7 +155,7 @@ public class SearchableActivity extends AppCompatActivity {
                     Log.d(TAG, cityList.size() + "");
 //                adapter.notifyDataSetChanged();//!!!!!!!!!!!!!!!!!!!!!!!!!!!!无效
 //                adapter.notifyItemInserted(adapter.getItemCount());//必须用此方法才能进行recycleview的刷新。（末尾刷新）
-                    RecyclerAdapter adapter = new RecyclerAdapter(SearchableActivity.this, cityList);
+                    CityRecyclerAdapter adapter = new CityRecyclerAdapter(SearchableActivity.this, cityList);
                     recyclerView.setAdapter(adapter);
                 }
                 return false;

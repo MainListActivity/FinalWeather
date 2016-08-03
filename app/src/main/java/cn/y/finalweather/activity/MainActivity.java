@@ -12,6 +12,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
@@ -21,10 +22,12 @@ import android.widget.TextView;
 
 import com.squareup.okhttp.Request;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import cn.y.finalweather.R;
+import cn.y.finalweather.adapter.NowWeatherAdapter;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.City;
 import cn.y.finalweather.model.CityInfo;
@@ -49,9 +52,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     public static final String TAG = "MainActivity";
     private FinalWeatherDB db;
     public static Handler handler;
-    private TextView tv;
     private ProgressDialog progressDialog;
     private ProgressDialog progressDialog1;
+    private RecyclerView rv;
     private HeWeather weather;
     private ActionBar actionBar;
     private SwipeRefreshLayout srl;
@@ -60,8 +63,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        tv = (TextView) findViewById(R.id.tv);
         srl= (SwipeRefreshLayout) findViewById(R.id.srl);
+
+        rv = (RecyclerView) findViewById(R.id.rv_main);
+        List<HeWeather> weathers = new ArrayList<>();
+        weathers.add(weather);
+        rv.setAdapter(new NowWeatherAdapter(this,weathers));
+
         srl.setColorSchemeResources(android.R.color.holo_orange_dark, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
         srl.setOnRefreshListener(this);
         db = FinalWeatherDB.getFinalWeatherDB(MainActivity.this);
