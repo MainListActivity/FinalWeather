@@ -1,5 +1,8 @@
 package cn.y.finalweather.adapter;
 
+import android.animation.AnimatorInflater;
+import android.animation.ObjectAnimator;
+import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -11,6 +14,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -23,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 
 import cn.y.finalweather.R;
+import cn.y.finalweather.db.FinalWeatherDB;
+import cn.y.finalweather.model.Condition;
 import cn.y.finalweather.model.HeWeather;
 
 /**
@@ -55,13 +62,13 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
                 view = inflater.inflate(R.layout.item_now_weather, parent, false);
                 break;
             case 1:
-            view = inflater.inflate(R.layout.item_daily_weather, parent, false);
+                view = inflater.inflate(R.layout.item_daily_weather, parent, false);
                 break;
             case 2:
-            view = inflater.inflate(R.layout.item_hourly_weather, parent, false);
+                view = inflater.inflate(R.layout.item_hourly_weather, parent, false);
                 break;
             case 3:
-            view = inflater.inflate(R.layout.item_now_suggestion, parent, false);
+                view = inflater.inflate(R.layout.item_now_suggestion, parent, false);
                 break;
         }
         MyViewHolder holder = new MyViewHolder(view);
@@ -70,9 +77,12 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
+        FinalWeatherDB db = FinalWeatherDB.getFinalWeatherDB(mContext);
+        List<Condition> conds = db.getCondition(new String[]{mDatas.getNow().getCond().getCode(), mDatas.getNow().getCond().getTxt()});
+        String upDateLocString = mDatas.getBasic().getUpdate().getLoc();
         switch (position) {
             case 0:
-                holder.textView.setText("我勒个去");
+                holder.textView.setText("上次更新：" + upDateLocString);
                 break;
             case 1:
                 holder.textViewDaily.setText("textViewDaily");
@@ -109,10 +119,19 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         TextView textViewDaily;
         TextView textViewHourly;
         TextView textViewSuggestion;
-
+        ImageView iv_weather_icon;
+        ImageView iv_wind_rotation;
 
         public MyViewHolder(View view) {
             super(view);
+            iv_weather_icon = (ImageView) view.findViewById(R.id.iv_weather_icon);
+            iv_wind_rotation = (ImageView) view.findViewById(R.id.iv_wind_rotation);
+            //通过一个动画资源加载器去加载一个动画xml文件
+            ObjectAnimator oa = (ObjectAnimator) AnimatorInflater.loadAnimator(mContext, R.animator.image_animaor);
+            TimeInterpolator interpolator = new LinearInterpolator();
+            oa.setInterpolator(interpolator);
+            oa.setTarget(iv_wind_rotation);
+            oa.start();
             textView = (TextView) view.findViewById(R.id.tv_refresh_date);
             textViewDaily = (TextView) view.findViewById(R.id.tv_daily);
             textViewHourly = (TextView) view.findViewById(R.id.tv_hourly);

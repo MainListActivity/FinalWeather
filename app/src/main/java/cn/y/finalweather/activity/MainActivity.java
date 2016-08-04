@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.MenuItemCompat;
@@ -15,6 +16,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -45,6 +47,7 @@ import cn.y.finalweather.model.CityInfo;
 import cn.y.finalweather.model.Condition;
 import cn.y.finalweather.model.ConditionInfo;
 import cn.y.finalweather.model.HeWeather;
+import cn.y.finalweather.util.DividerItemDecoration;
 import cn.y.finalweather.util.OkHttpClientManager;
 
 /**
@@ -54,7 +57,7 @@ import cn.y.finalweather.util.OkHttpClientManager;
  * 城市天气接口： https://api.heweather.com/x3/weather?cityid=城市ID&key=你的认证key
  */
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener,SurfaceHolder.Callback{
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, SurfaceHolder.Callback {
 
     public static final String FULL_CITY_URL = "https://api.heweather.com/x3/citylist?search=allworld&key=9c121f3f984f4dde86917788a38b9956";
     private String CONDITION_URL = "https://api.heweather.com/x3/condition?search=allcond&key=9c121f3f984f4dde86917788a38b9956";
@@ -79,8 +82,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         sv = (SurfaceView) findViewById(R.id.sv);
         //设置播放时打开屏幕
         sv.getHolder().setKeepScreenOn(true);
-        sv.getHolder().addCallback(this);
-        srl= (SwipeRefreshLayout) findViewById(R.id.srl);
+        srl = (SwipeRefreshLayout) findViewById(R.id.srl);
 
 
         srl.setColorSchemeResources(android.R.color.holo_orange_dark, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         db = FinalWeatherDB.getFinalWeatherDB(MainActivity.this);
         progressDialog1 = new ProgressDialog(MainActivity.this);
         actionBar = getSupportActionBar();
-        if (actionBar!=null) {
+        if (actionBar != null) {
             actionBar.setLogo(R.drawable.ic_city_gps);
             actionBar.setDisplayUseLogoEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
@@ -96,8 +98,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
         weather = db.getWeather(sp);
-        if (weather.getBasic().getCity()!=null) {
+        if (weather.getBasic().getCity() != null) {
             actionBar.setTitle(weather.getBasic().getCity());
+            sv.getHolder().addCallback(this);
+            Log.d(TAG, "103: weather.getBasic().getCity() != null");
 
             rv = (RecyclerView) findViewById(R.id.rv_main);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -105,11 +109,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             rv.setLayoutManager(layoutManager);
             //设置为垂直布局，这也是默认的
             layoutManager.setOrientation(OrientationHelper.VERTICAL);
-            rv.setAdapter(new NowWeatherAdapter(this,weather));
+            //设置增加或删除条目的动画
+            rv.setItemAnimator(new DefaultItemAnimator());
+            //添加分割线
+            rv.addItemDecoration(new DividerItemDecoration(this, layoutManager.getOrientation(),3));
+            rv.setAdapter(new NowWeatherAdapter(this, weather));
 
-        }else {
+        } else {
             saveConditionInDb();
-            Intent intent = new Intent(this,SearchableActivity.class);
+            Intent intent = new Intent(this, SearchableActivity.class);
             saveCityInDb(intent);
         }
         handler = new Handler() {
@@ -189,8 +197,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 //                    db.saveCity(city);
                             }
                             Log.d(TAG, "全部已存入数据库!");
-                            if (intent != null)
+                            if (intent != null) {
                                 startActivityForResult(intent, 0);
+                            }
                         }
 
 
@@ -269,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     saveCityInDb(intent);
                 } else {
                     startActivityForResult(intent, 0);
+
                 }
 
                 return false;
@@ -284,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     /**
      * 从网络获取天气数据，并更新本地数据
+     *
      * @param cityId :如果传入一个cityId则从网络获取这个Id对应的天气数据，如果不传入则更新本地城市数据
      */
     private void refreshWeather(String cityId) {
@@ -306,6 +317,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     HeWeather heWeather = response.get("HeWeather data service 3.0").get(0);
                     String city = heWeather.getBasic().getCity();
                     actionBar.setTitle(city);
+                    sv.getHolder().removeCallback(MainActivity.this);
+                    sv.getHolder().addCallback(MainActivity.this);
+                    Log.d(TAG, "sv.getHolder().addCallback(MainActivity.this);");
                     SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
                     db.saveWeather(heWeather, sp, false);
                     //TODO:将Weather对象加到UI中
@@ -321,9 +335,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         });
 
     }
+
     @Override
     public void onRefresh() {
-        new Handler() .postDelayed(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 // 停止刷新
@@ -333,109 +348,125 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        setSurface();
+    }
+
+    private void setSurface() {
+
         mediaPlayer1 = new MediaPlayer();
-        Log.d(TAG,"surfaceCreated");
+        Log.d(TAG, "surfaceCreated");
         try {
+            String uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video100;
             mediaPlayer1.setLooping(true);
             // 把视频输出到SurfaceView上
             mediaPlayer1.setDisplay(sv.getHolder());
             mediaPlayer1.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date date = dateFormat.parse(weather.getBasic().getUpdate().getLoc());
-            Calendar calendar = dateFormat.getCalendar();
-            calendar.setTime(date);
-            int nowDate = calendar.get(Calendar.HOUR_OF_DAY);//设置为HOUR得到的是12小时制的时间，使用HOUR_OF_DAY得到的是24小时制的时间
-            int srDate = Integer.valueOf(weather.getDaily_forecast().get(0).getAstro().getSr().substring(0,2));//本地存储的日出时间
-            int ssDate = Integer.valueOf(weather.getDaily_forecast().get(0).getAstro().getSs().substring(0,2));//本地存储的日落时间
-            Log.d(TAG,ssDate+"：当前时间=="+weather.getNow().getCond().getCode());
-            String uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video100;
-            switch (Integer.valueOf(weather.getNow().getCond().getCode())){
-                case 100:
-                    if (nowDate>srDate&&nowDate<ssDate)
-                    {}else{uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video_night100;}
-                    break;
-                case 101:
-                case 102:
-                    if (nowDate>srDate&&nowDate<ssDate)
-                    {uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video101;}else{uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video_night101;}
-                    break;
-                case 103:
-                case 104:
-                    if (nowDate>srDate&&nowDate<ssDate)
-                    {uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video103;}else{uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video_night103;}
-                    break;
-                case 200:
-                case 201:
-                case 202:
-                case 203:
-                case 204:
-                case 205:
-                case 206:
-                case 207:
-                case 208:
-                case 209:
-                case 210:
-                case 211:
-                case 212:
-                case 213:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video200;
-                    break;
-                case 302:
-                case 303:
-                case 304:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video302;
-                    break;
-                case 300:
-                case 301:
-                case 305:
-                case 306:
-                case 307:
-                case 308:
-                case 309:
-                case 310:
-                case 311:
-                case 312:
-                case 313:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video305;
-                    break;
-                case 400:
-                case 401:
-                case 402:
-                case 403:
-                case 407:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video400;
-                    break;
-                case 404:
-                case 405:
-                case 406:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video406;
-                    break;
-                case 500:
-                case 501:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video501;
-                    break;
-                case 502:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video502;
-                    break;
-                case 503:
-                case 504:
-                case 506:
-                case 507:
-                case 508:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video503;
-                    break;
-                case 900:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video900;
-                    break;
-                case 901:
-                    uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video901;
-                    break;
+            if (weather.getBasic().getUpdate().getLoc() != null) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+                Date date = dateFormat.parse(weather.getBasic().getUpdate().getLoc());
+                Calendar calendar = dateFormat.getCalendar();
+                calendar.setTime(date);
+                int nowDate = calendar.get(Calendar.HOUR_OF_DAY);//设置为HOUR得到的是12小时制的时间，使用HOUR_OF_DAY得到的是24小时制的时间
+                int srDate = Integer.valueOf(weather.getDaily_forecast().get(0).getAstro().getSr().substring(0, 2));//本地存储的日出时间
+                int ssDate = Integer.valueOf(weather.getDaily_forecast().get(0).getAstro().getSs().substring(0, 2));//本地存储的日落时间
+                Log.d(TAG, ssDate + "：当前时间==" + weather.getNow().getCond().getCode());
+                switch (Integer.valueOf(weather.getNow().getCond().getCode())) {
+                    case 100:
+                        if (nowDate > srDate && nowDate < ssDate) {
+                        } else {
+                            uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video_night100;
+                        }
+                        break;
+                    case 101:
+                    case 102:
+                        if (nowDate > srDate && nowDate < ssDate) {
+                            uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video101;
+                        } else {
+                            uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video_night101;
+                        }
+                        break;
+                    case 103:
+                    case 104:
+                        if (nowDate > srDate && nowDate < ssDate) {
+                            uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video103;
+                        } else {
+                            uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video_night103;
+                        }
+                        break;
+                    case 200:
+                    case 201:
+                    case 202:
+                    case 203:
+                    case 204:
+                    case 205:
+                    case 206:
+                    case 207:
+                    case 208:
+                    case 209:
+                    case 210:
+                    case 211:
+                    case 212:
+                    case 213:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video200;
+                        break;
+                    case 302:
+                    case 303:
+                    case 304:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video302;
+                        break;
+                    case 300:
+                    case 301:
+                    case 305:
+                    case 306:
+                    case 307:
+                    case 308:
+                    case 309:
+                    case 310:
+                    case 311:
+                    case 312:
+                    case 313:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video305;
+                        break;
+                    case 400:
+                    case 401:
+                    case 402:
+                    case 403:
+                    case 407:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video400;
+                        break;
+                    case 404:
+                    case 405:
+                    case 406:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video406;
+                        break;
+                    case 500:
+                    case 501:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video501;
+                        break;
+                    case 502:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video502;
+                        break;
+                    case 503:
+                    case 504:
+                    case 506:
+                    case 507:
+                    case 508:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video503;
+                        break;
+                    case 900:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video900;
+                        break;
+                    case 901:
+                        uriString = "android.resource://" + MainActivity.this.getPackageName() + "/" + R.raw.video901;
+                        break;
 
-            };
+                }
+            }else {
+                Log.d(TAG,"weather.getBasic().getUpdate().getLoc() == null");
+            }
             Uri uri = Uri.parse(uriString);//Uri uri=Uri.paese("android.resource://包名/"+R.raw.xxx);
             mediaPlayer1.setDataSource(MainActivity.this, uri);//"android:resource://包名/"+R.raw.xxx
             mediaPlayer1.prepare();
@@ -447,14 +478,15 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
+
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
+        Log.d("surfaceChanged", "surfaceChanged");
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        if (mediaPlayer1.isPlaying())
+        if (mediaPlayer1!=null &&mediaPlayer1.isPlaying())
             mediaPlayer1.stop();
         mediaPlayer1.release();
     }

@@ -60,7 +60,7 @@ public class SearchableActivity extends AppCompatActivity {
         //设置增加或删除条目的动画
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //添加分割线
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, layoutManager.getOrientation()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, layoutManager.getOrientation(),1));
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -87,14 +87,18 @@ public class SearchableActivity extends AppCompatActivity {
 //                Log.d(TAG, "Xs: " + pointStart.x + "\nXe: " + pointEnd.x);
                 if (Math.abs(pointStart.x - pointEnd.x) < 2 && Math.abs(pointStart.y - pointEnd.y) < 2) {
                     View v = rv.findChildViewUnder(e.getX(), e.getY());
-                    int position = rv.getChildLayoutPosition(v);
-//                    Log.d(TAG, rv.getChildLayoutPosition(v) + "");
-                    String cityId = cityList.get(position).getId();
-                    Intent intent = new Intent();
-                    intent.putExtra("cityId", cityId);
-                    setResult(RESULT_OK, intent);
-                    Log.d(TAG, cityId);
-                    finish();
+                    if (cityList!=null) {
+                        int position = rv.getChildLayoutPosition(v);
+//                        Log.d(TAG, rv.getChildLayoutPosition(v) + "<===aaaaaaa====>");
+                        String cityId = cityList.get(position).getId();
+                        Intent intent = new Intent();
+                        intent.putExtra("cityId", cityId);
+                        setResult(RESULT_OK, intent);
+                        Log.d(TAG, cityId);
+                        finish();
+                    }else{
+                        Log.d(TAG, "cityList==null");
+                    }
                 }
                 return false;
             }
