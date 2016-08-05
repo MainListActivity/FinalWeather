@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private HeWeather weather;
     private ActionBar actionBar;
     private SurfaceView sv;
+    private NowWeatherAdapter adapter;
     private SwipeRefreshLayout srl;
 
     @Override
@@ -111,9 +112,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             layoutManager.setOrientation(OrientationHelper.VERTICAL);
             //设置增加或删除条目的动画
             rv.setItemAnimator(new DefaultItemAnimator());
-            //添加分割线
-            rv.addItemDecoration(new DividerItemDecoration(this, layoutManager.getOrientation(),3));
-            rv.setAdapter(new NowWeatherAdapter(this, weather));
+            adapter = new NowWeatherAdapter(this, weather);
+            rv.setAdapter(adapter);
 
         } else {
             saveConditionInDb();
@@ -241,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        rv.setAdapter(new NowWeatherAdapter(this, weather));
         switch (requestCode) {
             case 0:
                 if (resultCode == RESULT_OK) {
@@ -254,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             default:
                 break;
         }
+
     }
 
     @Override
@@ -322,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     Log.d(TAG, "sv.getHolder().addCallback(MainActivity.this);");
                     SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
                     db.saveWeather(heWeather, sp, false);
+                    rv.setAdapter(new NowWeatherAdapter(MainActivity.this,heWeather));
                     //TODO:将Weather对象加到UI中
 //                                    if (heWeather.getNow() != null) {
 //                                        Log.d("HeWeather", heWeather.getNow().getFl() + "");
@@ -464,8 +467,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                         break;
 
                 }
-            }else {
-                Log.d(TAG,"weather.getBasic().getUpdate().getLoc() == null");
+            } else {
+                Log.d(TAG, "weather.getBasic().getUpdate().getLoc() == null");
             }
             Uri uri = Uri.parse(uriString);//Uri uri=Uri.paese("android.resource://包名/"+R.raw.xxx);
             mediaPlayer1.setDataSource(MainActivity.this, uri);//"android:resource://包名/"+R.raw.xxx
@@ -486,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        if (mediaPlayer1!=null &&mediaPlayer1.isPlaying())
+        if (mediaPlayer1 != null && mediaPlayer1.isPlaying())
             mediaPlayer1.stop();
         mediaPlayer1.release();
     }

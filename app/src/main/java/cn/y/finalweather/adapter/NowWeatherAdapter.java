@@ -82,7 +82,7 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         String upDateLocString = mDatas.getBasic().getUpdate().getLoc();
         switch (position) {
             case 0:
-                holder.textView.setText("上次更新：" + upDateLocString);
+                adapterNowWeather(holder);
                 break;
             case 1:
                 holder.textViewDaily.setText("textViewDaily");
@@ -113,14 +113,59 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         return 4;
     }
 
+    /**
+     * 只有允许在NowWeatherAdapter中的onBindViewHolder里面调用
+     *
+     * @param holder 传入一个MyViewHolder
+     */
+    private void adapterNowWeather(MyViewHolder holder) {
+        String upDateLocString = mDatas.getBasic().getUpdate().getLoc();
+        holder.textView.setText(upDateLocString);
+        HeWeather.Now now = mDatas.getNow();
+        String deg = mDatas.getNow().getWind().getDeg();
+        float degF = Float.valueOf(deg);
+        ObjectAnimator//
+                .ofFloat(holder.iv_now_wind_deg, "rotation", 0.0F, degF)//
+                .setDuration(1500)//
+                .start();
+        holder.tv_now_wind_dir.setText(now.getWind().getDir());
+        holder.tv_now_wind_sc.setText(now.getWind().getSc());
+        holder.tv_now_wind_spd.setText(now.getWind().getSpd());
+        holder.tv_weather_text.setText(now.getCond().getTxt());
+        holder.tv_now_fl.setText(now.getFl());
+        holder.tv_now_hum.setText(now.getHum());
+        holder.tv_now_pcpn.setText(now.getPcpn());
+        holder.tv_now_pres.setText(now.getPres());
+        holder.tv_now_vis.setText(now.getVis());
+        String tmp = now.getTmp();
+        int shi = Integer.valueOf(tmp.substring(0, 1)) + R.mipmap.t0;
+        int ge = Integer.valueOf(tmp.substring(1, 2)) + R.mipmap.t0;
+
+        holder.iv_weather_du_ge.setImageResource(ge);
+        holder.iv_weather_du_shi.setImageResource(shi);
+        Log.d(TAG, "shi: " + Integer.valueOf(tmp.substring(0, 1)) + "\nge: " + Integer.valueOf(tmp.substring(1, 2)));
+    }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         TextView textViewDaily;
         TextView textViewHourly;
         TextView textViewSuggestion;
+        TextView tv_weather_text;
+        TextView tv_now_fl;
+        TextView tv_now_wind_dir;
+        TextView tv_now_wind_sc;
+        TextView tv_now_wind_spd;
+        TextView tv_now_hum;
+        TextView tv_now_pcpn;
+        TextView tv_now_pres;
+        TextView tv_now_vis;
+
         ImageView iv_weather_icon;
         ImageView iv_wind_rotation;
+        ImageView iv_weather_du_shi;
+        ImageView iv_weather_du_ge;
+        ImageView iv_now_wind_deg;
 
         public MyViewHolder(View view) {
             super(view);
@@ -132,10 +177,24 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
             oa.setInterpolator(interpolator);
             oa.setTarget(iv_wind_rotation);
             oa.start();
+
+            iv_weather_du_shi = (ImageView) view.findViewById(R.id.iv_weather_du_shi);
+            iv_weather_du_ge = (ImageView) view.findViewById(R.id.iv_weather_du_ge);
+            iv_now_wind_deg = (ImageView) view.findViewById(R.id.iv_now_wind_deg);
+
             textView = (TextView) view.findViewById(R.id.tv_refresh_date);
             textViewDaily = (TextView) view.findViewById(R.id.tv_daily);
             textViewHourly = (TextView) view.findViewById(R.id.tv_hourly);
             textViewSuggestion = (TextView) view.findViewById(R.id.tv_now_suggestion);
+            tv_weather_text = (TextView) view.findViewById(R.id.tv_weather_text);
+            tv_now_fl = (TextView) view.findViewById(R.id.tv_now_fl);
+            tv_now_wind_dir = (TextView) view.findViewById(R.id.tv_now_wind_dir);
+            tv_now_wind_sc = (TextView) view.findViewById(R.id.tv_now_wind_sc);
+            tv_now_wind_spd = (TextView) view.findViewById(R.id.tv_now_wind_spd);
+            tv_now_hum = (TextView) view.findViewById(R.id.tv_now_hum);
+            tv_now_pcpn = (TextView) view.findViewById(R.id.tv_now_pcpn);
+            tv_now_pres = (TextView) view.findViewById(R.id.tv_now_pres);
+            tv_now_vis = (TextView) view.findViewById(R.id.tv_now_vis);
 
         }
 
