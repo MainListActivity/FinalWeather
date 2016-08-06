@@ -14,8 +14,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:gravity="center"
             android:background="@color/bgMainWeather"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
@@ -111,14 +111,14 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@mipmap/t2" />
+                android:src="@mipmap/org4_widget_nw1" />
 
             <ImageView
                 android:id="@+id/iv_weather_du_ge"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@mipmap/t2" />
+                android:src="@mipmap/org4_widget_nw6" />
 
             <ImageView
                 android:layout_width="0dp"
@@ -127,10 +127,30 @@
                 android:src="@mipmap/centigrade" />
         </LinearLayout>
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/ll_suggestion"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/bgMainWeather" />
+            android:layout_height="100sp"
+            android:background="@color/bgMainWeather"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_suggestion_notify"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:src="@mipmap/main_icon_notify" />
+
+            <TextView
+                android:id="@+id/tv_suggestion_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="白天不太热也不太冷，风力不大，相信您在这样的天气条件下，应会感到比较清爽和舒适。"
+                android:textColor="@color/textColor"
+                android:textSize="20sp" />
+        </LinearLayout>
+
 
         <TextView
             android:layout_width="match_parent"

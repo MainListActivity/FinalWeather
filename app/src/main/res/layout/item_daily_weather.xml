@@ -4,8 +4,19 @@
     android:layout_height="match_parent"
     android:background="@color/bgMainWeather"
     android:orientation="vertical">
-<TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/tv_daily"/>
+
+    <TextView
+        android:id="@+id/tv_daily"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="天气预报"
+        android:gravity="center"
+        android:background="@drawable/widget_small_widget_background"
+        android:textColor="@color/textColor"
+        android:textSize="20sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_daily"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
 </LinearLayout>

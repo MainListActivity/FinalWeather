@@ -27,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.squareup.okhttp.Request;
 
@@ -493,4 +494,5 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             mediaPlayer1.stop();
         mediaPlayer1.release();
     }
+    public void nullClick(View view){}
 }
