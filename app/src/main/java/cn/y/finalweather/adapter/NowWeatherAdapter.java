@@ -4,11 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.TimeInterpolator;
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.os.Handler;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
@@ -17,7 +14,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -69,25 +65,27 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
                 view = inflater.inflate(R.layout.item_daily_weather, parent, false);
                 break;
         }
-        MyViewHolder holder = new MyViewHolder(view, viewType);
-        return holder;
+
+        return new MyViewHolder(view, viewType);
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        String upDateLocString = mDatas.getBasic().getUpdate().getLoc();
+//        String upDateLocString = mDatas.getBasic().getUpdate().getLoc();
         switch (position) {
             case 0:
                 adapterNowWeather(holder);
                 break;
             case 1:
 //                holder.textViewDaily.setText("textViewDaily");
+                holder.rv_hourly.setAdapter(new ItemHourlyAdapter(mContext, mDatas.getHourly_forecast()));
+                holder.rv_hourly.addItemDecoration(new DividerItemDecoration(mContext, LinearLayoutManager.HORIZONTAL, 1));
                 break;
             case 2:
 //                holder.textViewHourly.setText("textViewHourly");
                 holder.rv_daily.setAdapter(new ItemDailyAdapter(mContext, mDatas.getDaily_forecast()));
-                holder.rv_daily.addItemDecoration(new DividerItemDecoration(mContext,LinearLayoutManager.HORIZONTAL,1));
+                holder.rv_daily.addItemDecoration(new DividerItemDecoration(mContext, LinearLayoutManager.HORIZONTAL, 1));
                 break;
         }
 
@@ -126,7 +124,6 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         suggestion.add(mDatas.getSuggestion().getTrav().getTxt());
         suggestion.add(mDatas.getSuggestion().getUv().getTxt());
         final List<String> suggestionList = suggestion;
-
         String upDateLocString = mDatas.getBasic().getUpdate().getLoc();
         holder.textView.setText(upDateLocString);
         HeWeather.Now now = mDatas.getNow();
@@ -169,15 +166,25 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         oa.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-
+                if (indexSuggestion < suggestionList.size())
+                    if (suggestionList.get(indexSuggestion) == null) {
+                        holder.ll_suggestion.setVisibility(View.GONE);
+                        holder.tv_suggestion_txt.setVisibility(View.GONE);
+                        holder.iv_suggestion_notify.setVisibility(View.GONE);
+                    } else {
+                        holder.ll_suggestion.setVisibility(View.VISIBLE);
+                        holder.tv_suggestion_txt.setVisibility(View.VISIBLE);
+                        holder.iv_suggestion_notify.setVisibility(View.VISIBLE);
+                    }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (indexSuggestion < suggestionList.size()) {
+                if (indexSuggestion < suggestionList.size() && suggestionList.get(indexSuggestion) != null) {
                     holder.tv_suggestion_txt.setText(suggestionList.get(indexSuggestion));
                     indexSuggestion++;
                 } else indexSuggestion = 0;
+
                 oa.start();
             }
 
@@ -196,8 +203,6 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
-        TextView textViewDaily;
-        TextView textViewHourly;
         TextView tv_weather_text;
         TextView tv_now_fl;
         TextView tv_now_wind_dir;
@@ -218,13 +223,11 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
 
         LinearLayout ll_suggestion;
         RecyclerView rv_daily;
+        RecyclerView rv_hourly;
 
 
         public MyViewHolder(View view, int viewType) {
             super(view);
-            textViewDaily = (TextView) view.findViewById(R.id.tv_daily);
-            textViewHourly = (TextView) view.findViewById(R.id.tv_hourly);
-
             switch (viewType) {
                 case 0:
                     ll_suggestion = (LinearLayout) view.findViewById(R.id.ll_suggestion);
@@ -260,6 +263,14 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
                     tv_suggestion_txt = (TextView) view.findViewById(R.id.tv_suggestion_txt);
                     break;
                 case 1:
+                    rv_hourly = (RecyclerView) view.findViewById(R.id.rv_hourly);
+                    LinearLayoutManager layoutManagerHourly = new LinearLayoutManager(mContext);
+                    //设置布局管理器
+                    rv_hourly.setLayoutManager(layoutManagerHourly);
+                    //设置为垂直布局，这也是默认的
+                    layoutManagerHourly.setOrientation(OrientationHelper.HORIZONTAL);
+                    //设置增加或删除条目的动画
+                    rv_hourly.setItemAnimator(new DefaultItemAnimator());
                     break;
                 case 2:
                     rv_daily = (RecyclerView) view.findViewById(R.id.rv_daily);

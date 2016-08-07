@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FinalWeather</string>
+    <string name="app_name">终点天气</string>
     <string name="action_search">搜索</string>
     <string name="update_date">上次更新：</string>
 </resources>

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:finalweather="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_setting"
+        android:icon="@mipmap/setting"
+        finalweather:showAsAction="always"
+        android:title="setting" />
+    <item
         android:id="@+id/action_search"
         android:icon="@android:drawable/ic_menu_search"
         android:title="@string/action_search"

@@ -8,9 +8,9 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -31,10 +31,13 @@ import android.view.View;
 
 import com.squareup.okhttp.Request;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +51,7 @@ import cn.y.finalweather.model.CityInfo;
 import cn.y.finalweather.model.Condition;
 import cn.y.finalweather.model.ConditionInfo;
 import cn.y.finalweather.model.HeWeather;
-import cn.y.finalweather.util.DividerItemDecoration;
+import cn.y.finalweather.service.FinalWeatherService;
 import cn.y.finalweather.util.OkHttpClientManager;
 
 /**
@@ -61,7 +64,7 @@ import cn.y.finalweather.util.OkHttpClientManager;
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, SurfaceHolder.Callback {
 
     public static final String FULL_CITY_URL = "https://api.heweather.com/x3/citylist?search=allworld&key=9c121f3f984f4dde86917788a38b9956";
-    private String CONDITION_URL = "https://api.heweather.com/x3/condition?search=allcond&key=9c121f3f984f4dde86917788a38b9956";
+    //    private String CONDITION_URL = "https://api.heweather.com/x3/condition?search=allcond&key=9c121f3f984f4dde86917788a38b9956";
     public static final int MSG_NET_CON = 0x00;
     public static final int MSG_PROGRESS_CHANGED = 0x01;
     public static final String TAG = "MainActivity";
@@ -81,11 +84,20 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         sv = (SurfaceView) findViewById(R.id.sv);
         //设置播放时打开屏幕
         sv.getHolder().setKeepScreenOn(true);
         srl = (SwipeRefreshLayout) findViewById(R.id.srl);
 
+        rv = (RecyclerView) findViewById(R.id.rv_main);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        //设置布局管理器
+        rv.setLayoutManager(layoutManager);
+        //设置为垂直布局，这也是默认的
+        layoutManager.setOrientation(OrientationHelper.VERTICAL);
+        //设置增加或删除条目的动画
+        rv.setItemAnimator(new DefaultItemAnimator());
 
         srl.setColorSchemeResources(android.R.color.holo_orange_dark, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
         srl.setOnRefreshListener(this);
@@ -105,21 +117,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             sv.getHolder().addCallback(this);
             Log.d(TAG, "103: weather.getBasic().getCity() != null");
 
-            rv = (RecyclerView) findViewById(R.id.rv_main);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            //设置布局管理器
-            rv.setLayoutManager(layoutManager);
-            //设置为垂直布局，这也是默认的
-            layoutManager.setOrientation(OrientationHelper.VERTICAL);
-            //设置增加或删除条目的动画
-            rv.setItemAnimator(new DefaultItemAnimator());
             adapter = new NowWeatherAdapter(this, weather);
             rv.setAdapter(adapter);
 
         } else {
-            saveConditionInDb();
+//            saveConditionInDb();
             Intent intent = new Intent(this, SearchableActivity.class);
-            saveCityInDb(intent);
+//            saveCityInDb(intent);
+            if (writeDB())
+                startActivityForResult(intent, 0);
+            else Log.e(TAG, "复制数据库失败");
         }
         handler = new Handler() {
             @Override
@@ -143,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
             }
         };
+        Intent intent = new Intent(this, FinalWeatherService.class);
+        startService(intent);
         //saveInDb();
 
 
@@ -211,34 +220,34 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         });
     }
 
-    private void saveConditionInDb() {
-        OkHttpClientManager.getAsyn(CONDITION_URL, new OkHttpClientManager.ResultCallback<ConditionInfo>() {
-            @Override
-            public void onError(Request request, Exception e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(ConditionInfo response) {
-                List<Condition> conditions = response.getCond_info();
-                List<Condition> conditionList = db.getCondition(new String[]{});
-                Log.d(TAG, "conditions: " + conditions.size() + "\nconditionList: " + conditionList.size());
-                if (conditionList != conditions) {
-                    for (Condition condition : conditions) {
-                        if (conditionList.size() > conditions.indexOf(condition)) {
-//                            Log.d(TAG, conditionList.get(conditions.indexOf(condition)).getCode() + ",读出：" + conditionList.get(conditions.indexOf(condition)).getIcon());
-                            if (condition.getCode() != conditionList.get(conditions.indexOf(condition)).getCode()) {
-                                db.updateConditionDB(condition, (conditions.indexOf(condition) + 1) + "");
-                            }
-                        } else {
-                            db.saveCondition(condition);
-//                            Log.d(TAG, "已存入数据库!" + condition.getIcon());
-                        }
-                    }
-                }
-            }
-        });
-    }
+//    private void saveConditionInDb() {
+//        OkHttpClientManager.getAsyn(CONDITION_URL, new OkHttpClientManager.ResultCallback<ConditionInfo>() {
+//            @Override
+//            public void onError(Request request, Exception e) {
+//                e.printStackTrace();
+//            }
+//
+//            @Override
+//            public void onResponse(ConditionInfo response) {
+//                List<Condition> conditions = response.getCond_info();
+//                List<Condition> conditionList = db.getCondition(new String[]{});
+//                Log.d(TAG, "conditions: " + conditions.size() + "\nconditionList: " + conditionList.size());
+//                if (conditionList != conditions) {
+//                    for (Condition condition : conditions) {
+//                        if (conditionList.size() > conditions.indexOf(condition)) {
+////                            Log.d(TAG, conditionList.get(conditions.indexOf(condition)).getCode() + ",读出：" + conditionList.get(conditions.indexOf(condition)).getIcon());
+//                            if (condition.getCode() != conditionList.get(conditions.indexOf(condition)).getCode()) {
+//                                db.updateConditionDB(condition, (conditions.indexOf(condition) + 1) + "");
+//                            }
+//                        } else {
+//                            db.saveCondition(condition);
+////                            Log.d(TAG, "已存入数据库!" + condition.getIcon());
+//                        }
+//                    }
+//                }
+//            }
+//        });
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -281,9 +290,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     saveCityInDb(intent);
                 } else {
                     startActivityForResult(intent, 0);
-
                 }
-
                 return false;
             }
 
@@ -295,6 +302,18 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_setting:
+                Intent intent = new Intent(this, SettingActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     /**
      * 从网络获取天气数据，并更新本地数据
      *
@@ -302,12 +321,25 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
      */
     private void refreshWeather(String cityId) {
         weather = new HeWeather();
+        srl.setRefreshing(true);
         SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
         HeWeather dbWeather = db.getWeather(sp);
         String dbCityId = dbWeather.getBasic().getId();
         cityId = cityId == null ? dbCityId : cityId;
         Log.d("CityCum", cityId + "<----->" + dbCityId);
         String WEATHER_URL = "https://api.heweather.com/x3/weather?cityid=" + cityId + "&key=9c121f3f984f4dde86917788a38b9956";
+        if (cityId.endsWith("A")) {
+            Snackbar.make(srl, "抱歉！由于资金不足暂时不支持景点天气，换个城市试试吧!", Snackbar.LENGTH_LONG)
+                    .setAction("重选", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(MainActivity.this, SearchableActivity.class);
+                            startActivityForResult(intent, 0);
+                        }
+                    })
+                    .show();
+            return;
+        }
         OkHttpClientManager.getAsyn(WEATHER_URL, new OkHttpClientManager.ResultCallback<Map<String, List<HeWeather>>>() {
             @Override
             public void onError(Request request, Exception e) {
@@ -325,8 +357,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     Log.d(TAG, "sv.getHolder().addCallback(MainActivity.this);");
                     SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
                     db.saveWeather(heWeather, sp, false);
-                    rv.setAdapter(new NowWeatherAdapter(MainActivity.this,heWeather));
-                    //TODO:将Weather对象加到UI中
+                    rv.setAdapter(new NowWeatherAdapter(MainActivity.this, heWeather));
+                    srl.setRefreshing(false);
 //                                    if (heWeather.getNow() != null) {
 //                                        Log.d("HeWeather", heWeather.getNow().getFl() + "");
 //                                    } else Log.d("HeWeather", "response.getNow()=null");
@@ -334,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 //                                        Log.d("HeWeather", heWeather.getStatus() + "");
 //                                        tv.setText(heWeather.getStatus());
 //                                    } else Log.d("HeWeather", "response.getStatus()=null");
-                } else Log.d("HeWeather", "response=null");
+                } else Log.d("HeWeather", "response = null");
             }
         });
 
@@ -342,13 +374,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // 停止刷新
-                srl.setRefreshing(false);
-            }
-        }, 5000); // 5秒后发送消息，停止刷新
+        SharedPreferences[] sp = new SharedPreferences[]{getSharedPreferences("basic", MODE_PRIVATE), getSharedPreferences("now", MODE_PRIVATE), getSharedPreferences("suggestion", MODE_PRIVATE)};
+        weather = db.getWeather(sp);
+        refreshWeather(weather.getBasic().getId());
+
     }
 
 
@@ -490,9 +519,59 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        if (mediaPlayer1 != null && mediaPlayer1.isPlaying())
-            mediaPlayer1.stop();
-        mediaPlayer1.release();
+        if (mediaPlayer1 != null) {
+            if (mediaPlayer1.isPlaying())
+                mediaPlayer1.stop();
+            mediaPlayer1.release();
+        }
     }
-    public void nullClick(View view){}
+
+    public void nullClick(View view) {
+    }
+
+    public boolean writeDB() {
+        Log.e(TAG, "文件系统：" + this.getDatabasePath("final_weather.db").getPath());
+        String f = this.getDatabasePath("final_weather.db").getPath();//此处如果是放在应用包名的目录下,自动放入“databases目录下
+        File file = new File("/data/data/" + getPackageName() + "/databases/");
+        File file1 = new File(f);
+        FileOutputStream fout = null;
+        InputStream inputStream = null;
+        try {
+            inputStream = getResources().openRawResource(R.raw.weather);
+
+            if (!file.exists())
+                if (file.mkdir())
+                    Log.d(TAG, file.getAbsolutePath() + "创建成功");
+            if (!file1.exists())
+                if (file1.createNewFile())
+                    Log.d(TAG, file1.getAbsolutePath() + "创建成功");
+            fout = new FileOutputStream(new File(f));
+            byte[] buffer = new byte[128];
+            int len = 0;
+            while ((len = inputStream.read(buffer)) != -1) {
+                fout.write(buffer, 0, len);
+            }
+            buffer = null;
+
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (fout != null) {
+                    fout.close();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 }
