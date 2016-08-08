@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -76,7 +75,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
             ll_setting_no_auto.setVisibility(View.GONE);
         }
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar!=null) {
+        if (actionBar != null) {
             actionBar.setHomeAsUpIndicator(R.drawable.abc_ic_ab_back_material);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -109,6 +108,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.ll_setting_update_hour://设置自动更新的时间间隔
                 alertDialog = new AlertDialog.Builder(this).create();
+                alertDialog.setView((this).getLayoutInflater().inflate(R.layout.alert_dialog_content, null));//使用这句话可以把键盘弹出来
                 alertDialog.show();
                 Window window = alertDialog.getWindow();
                 window.setContentView(R.layout.alert_dialog_content);

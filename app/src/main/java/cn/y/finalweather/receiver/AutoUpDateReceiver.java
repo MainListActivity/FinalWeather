@@ -23,14 +23,16 @@ public class AutoUpDateReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         SharedPreferences sp = context.getSharedPreferences("setting", Context.MODE_PRIVATE);
         Log.d("AutoUpDateReceiver", intent.getAction() + "\nbootStart" + sp.getBoolean("bootStart", true) + "\nautoUpdate" + sp.getBoolean("autoUpdate", true));
-        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+        if (intent.getAction() == null) {
+            Intent i = new Intent(context, FinalWeatherService.class);
+            context.startService(i);
+        } else if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             if (sp.getBoolean("bootStart", true)) {
                 Intent i = new Intent(context, FinalWeatherService.class);
                 context.startService(i);
             }
-        } else if (sp.getBoolean("autoUpdate", true)) {
-            Intent i = new Intent(context, FinalWeatherService.class);
-            context.startService(i);
+        } else if (intent.getAction().equals("android.intent.action.TIME_TICK")) {
+
         }
     }
 }

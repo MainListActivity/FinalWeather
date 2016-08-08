@@ -48,10 +48,9 @@ import cn.y.finalweather.adapter.NowWeatherAdapter;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.City;
 import cn.y.finalweather.model.CityInfo;
-import cn.y.finalweather.model.Condition;
-import cn.y.finalweather.model.ConditionInfo;
 import cn.y.finalweather.model.HeWeather;
 import cn.y.finalweather.service.FinalWeatherService;
+import cn.y.finalweather.service.TimeTickService;
 import cn.y.finalweather.util.OkHttpClientManager;
 
 /**
@@ -153,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         Intent intent = new Intent(this, FinalWeatherService.class);
         startService(intent);
+        startService(new Intent(this, TimeTickService.class));
         //saveInDb();
 
 

@@ -47,6 +47,7 @@ public class FinalWeatherService extends Service {
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         SharedPreferences sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
         int hour = sp.getInt("hour", 6) * 60 * 60 * 1000;
+//        int hour = 5000;
         long triggerAtTime = SystemClock.elapsedRealtime() + hour;
         Intent i = new Intent(this, AutoUpDateReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);

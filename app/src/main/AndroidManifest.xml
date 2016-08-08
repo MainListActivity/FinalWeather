@@ -18,9 +18,9 @@
         <activity
             android:name=".activity.MainActivity"
             android:logo="@drawable/ic_city_gps">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -28,24 +28,37 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".activity.SettingActivity"
-            android:parentActivityName=".activity.MainActivity"
-            android:label="设置" >
+            android:label="设置"
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
         </activity>
 
+        <activity android:name=".activity.FinalWeatherAppWidgetConfigure"/>
         <service android:name=".service.FinalWeatherService" />
+        <service android:name=".service.TimeTickService" />
+
         <receiver android:name=".receiver.AutoUpDateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+        </receiver>
+        <receiver android:name=".provider.FinalWeatherAppWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_provider" />
         </receiver>
     </application>
 
