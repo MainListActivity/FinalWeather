@@ -2,9 +2,12 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#3F51B5</color>
     <color name="refreshDate">#4F0f0f0f</color>
     <color name="bgMainWeather">#850074a6</color>
     <color name="textColor">#eaeaeaea</color>
+    <color name="settingTextColor">#7ff7f7f7</color>
+    <color name="transparentGrey">#7f7f7f7f</color>
+    <color name="greyText">#84191919</color>
     <color name="transparent">#00ffffff</color>
 </resources>

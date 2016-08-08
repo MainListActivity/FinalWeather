@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/custom_dialog_title"
+        android:paddingEnd="50dp"
+        android:paddingStart="50dp"
+        android:gravity="center"
+        android:text="@string/setting_dialog_title"
+        android:textColor="@color/greyText"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingEnd="70dp"
+        android:paddingStart="70dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_interval"
+            android:textColor="@color/greyText"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/et_setting_hour"
+            android:layout_width="50dp"
+            android:inputType="numberSigned"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/greyText"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setting_hour"
+            android:textColor="@color/greyText"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/bt_dialog_true"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/custom_dialog_left_button"
+            android:text="@string/setting_dialog_true" />
+
+        <Button
+            android:id="@+id/bt_dialog_false"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/custom_dialog_right_button"
+            android:text="@string/setting_dialog_false" />
+    </LinearLayout>
+</LinearLayout>

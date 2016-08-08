@@ -2,4 +2,19 @@
     <string name="app_name">终点天气</string>
     <string name="action_search">搜索</string>
     <string name="update_date">上次更新：</string>
+    <string name="setting_notify">推送通知</string>
+    <string name="setting_tmp">温度</string>
+    <string name="setting_display">显示</string>
+    <string name="setting_notify_no_push">通知</string>
+    <string name="setting_update">更新</string>
+    <string name="setting_auto_update">自动更新</string>
+    <string name="setting_auto_hour">更新间隔</string>
+    <string name="setting_interval">间隔</string>
+    <string name="setting_hour">小时</string>
+    <string name="setting_boot_start">开机启动</string>
+    <string name="setting_start">启动</string>
+    <string name="setting_dialog_title">设置更新间隔</string>
+    <string name="setting_dialog_true">确定</string>
+    <string name="setting_dialog_false">取消</string>
+
 </resources>

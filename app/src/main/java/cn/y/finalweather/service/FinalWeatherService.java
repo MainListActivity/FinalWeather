@@ -45,7 +45,8 @@ public class FinalWeatherService extends Service {
             }
         }.start();
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int hour = 6 * 60 * 60 * 1000;
+        SharedPreferences sp = getSharedPreferences("setting", Context.MODE_PRIVATE);
+        int hour = sp.getInt("hour", 6) * 60 * 60 * 1000;
         long triggerAtTime = SystemClock.elapsedRealtime() + hour;
         Intent i = new Intent(this, AutoUpDateReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
@@ -73,7 +74,7 @@ public class FinalWeatherService extends Service {
         cityId = cityId == null ? dbCityId : cityId;
         Log.d("CityCum", cityId + "<----->" + dbCityId);
         String WEATHER_URL = "https://api.heweather.com/x3/weather?cityid=" + cityId + "&key=9c121f3f984f4dde86917788a38b9956";
-        if (cityId.endsWith("A")) {
+        if (cityId == null || cityId.endsWith("A")) {
             return;
         }
         OkHttpClientManager.getAsyn(WEATHER_URL, new OkHttpClientManager.ResultCallback<Map<String, List<HeWeather>>>() {

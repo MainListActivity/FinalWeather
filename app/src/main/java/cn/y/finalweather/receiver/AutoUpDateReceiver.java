@@ -3,6 +3,8 @@ package cn.y.finalweather.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 import cn.y.finalweather.service.FinalWeatherService;
 
@@ -19,7 +21,16 @@ import cn.y.finalweather.service.FinalWeatherService;
 public class AutoUpDateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent i = new Intent(context, FinalWeatherService.class);
-        context.startService(i);
+        SharedPreferences sp = context.getSharedPreferences("setting", Context.MODE_PRIVATE);
+        Log.d("AutoUpDateReceiver", intent.getAction() + "\nbootStart" + sp.getBoolean("bootStart", true) + "\nautoUpdate" + sp.getBoolean("autoUpdate", true));
+        if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+            if (sp.getBoolean("bootStart", true)) {
+                Intent i = new Intent(context, FinalWeatherService.class);
+                context.startService(i);
+            }
+        } else if (sp.getBoolean("autoUpdate", true)) {
+            Intent i = new Intent(context, FinalWeatherService.class);
+            context.startService(i);
+        }
     }
 }

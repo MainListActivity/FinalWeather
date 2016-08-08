@@ -150,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
             }
         };
+
         Intent intent = new Intent(this, FinalWeatherService.class);
         startService(intent);
         //saveInDb();
@@ -293,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
                 return false;
             }
-
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 return false;
