@@ -17,6 +17,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
+            android:theme="@style/Transparent"
             android:logo="@drawable/ic_city_gps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,7 +25,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SearchableActivity">
+        <activity
+            android:theme="@style/Transparent"
+            android:name=".activity.SearchableActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -36,13 +39,16 @@
         <activity
             android:name=".activity.SettingActivity"
             android:label="设置"
+            android:theme="@style/Transparent"
             android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MainActivity" />
         </activity>
 
-        <activity android:name=".activity.FinalWeatherAppWidgetConfigure"/>
+        <activity
+            android:theme="@style/Transparent"
+            android:name=".activity.FinalWeatherAppWidgetConfigure"/>
         <service android:name=".service.FinalWeatherService" />
         <service android:name=".service.TimeTickService" />
 

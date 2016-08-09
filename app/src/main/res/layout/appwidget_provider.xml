@@ -1,64 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
     android:id="@+id/ll_widget_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/org3_widgetback2"
     android:orientation="horizontal"
     android:padding="10dp">
     <!--android:background="@drawable/org3_widgetback2"-->
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="2"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/iv_widget_time_hour_shi"
+            android:layout_width="32dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/org4_widget_nw1" />
+
+        <ImageView
+            android:id="@+id/iv_widget_time_hour_ge"
+            android:layout_width="32dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/org4_widget_nw2" />
+
+        <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="match_parent"
+            android:src="@mipmap/org4_widget_colon" />
 
-            <ImageView
-                android:id="@+id/iv_widget_time_hour_shi"
-                android:layout_width="32dp"
-                android:layout_height="45dp"
-                android:src="@mipmap/org4_widget_nw1" />
+        <ImageView
+            android:id="@+id/iv_widget_time_minute_shi"
+            android:layout_width="32dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/org4_widget_nw3" />
 
-            <ImageView
-                android:id="@+id/iv_widget_time_hour_ge"
-                android:layout_width="32dp"
-                android:layout_height="45dp"
-                android:src="@mipmap/org4_widget_nw1" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@mipmap/org4_widget_colon" />
-
-            <ImageView
-                android:id="@+id/iv_widget_time_minute_shi"
-                android:layout_width="32dp"
-                android:layout_height="45dp"
-                android:src="@mipmap/org4_widget_nw1" />
-
-            <ImageView
-                android:id="@+id/iv_widget_time_minute_ge"
-                android:layout_width="32dp"
-                android:layout_height="45dp"
-                android:src="@mipmap/org4_widget_nw1" />
+        <ImageView
+            android:id="@+id/iv_widget_time_minute_ge"
+            android:layout_width="32dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/org4_widget_nw4" />
 
 
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_widget_cond_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:paddingEnd="30dp"
-            android:text="晴"
-            android:textColor="@color/textColor" />
     </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -137,6 +123,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_widget_cond_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:paddingEnd="30dp"
+                android:text="晴"
+                android:textColor="@color/textColor" />
 
             <TextView
                 android:id="@+id/tv_widget_yd"

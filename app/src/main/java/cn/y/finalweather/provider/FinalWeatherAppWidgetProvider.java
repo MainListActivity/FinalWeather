@@ -19,6 +19,7 @@ import cn.y.finalweather.activity.MainActivity;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.Condition;
 import cn.y.finalweather.model.HeWeather;
+import cn.y.finalweather.service.FinalWeatherService;
 
 /**
  * =============================================
@@ -100,6 +101,7 @@ public class FinalWeatherAppWidgetProvider extends AppWidgetProvider {
                 PendingIntent.FLAG_CANCEL_CURRENT);
         views.setOnClickPendingIntent(R.id.ll_widget_content, pendingIntent);
         setWidget(context, views);
+        context.startService((new Intent(context, FinalWeatherService.class)));
         // 给View 上的两个按钮绑定事件，这里是广播消息的发送
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }

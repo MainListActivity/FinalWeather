@@ -1,12 +1,16 @@
 package cn.y.finalweather.receiver;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import cn.y.finalweather.service.FinalWeatherService;
+import cn.y.finalweather.service.TimeTickService;
 
 /**
  * =============================================
@@ -30,6 +34,7 @@ public class AutoUpDateReceiver extends BroadcastReceiver {
             if (sp.getBoolean("bootStart", true)) {
                 Intent i = new Intent(context, FinalWeatherService.class);
                 context.startService(i);
+                context.startService(new Intent(context, TimeTickService.class));
             }
         } else if (intent.getAction().equals("android.intent.action.TIME_TICK")) {
 

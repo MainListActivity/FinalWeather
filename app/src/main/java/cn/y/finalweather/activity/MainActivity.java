@@ -45,6 +45,7 @@ import java.util.Map;
 
 import cn.y.finalweather.R;
 import cn.y.finalweather.adapter.NowWeatherAdapter;
+import cn.y.finalweather.application.FinalApplication;
 import cn.y.finalweather.db.FinalWeatherDB;
 import cn.y.finalweather.model.City;
 import cn.y.finalweather.model.CityInfo;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             adapter = new NowWeatherAdapter(this, weather);
             rv.setAdapter(adapter);
-
+            FinalApplication.buildNotification();
         } else {
 //            saveConditionInDb();
             Intent intent = new Intent(this, SearchableActivity.class);
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         Intent intent = new Intent(this, FinalWeatherService.class);
         startService(intent);
         startService(new Intent(this, TimeTickService.class));
+
         //saveInDb();
 
 
@@ -260,6 +262,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 //                    Log.d("cityId", cityId);
                     if (cityId != null) {
                         refreshWeather(cityId);
+
                     }
                 }
                 break;
@@ -359,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     db.saveWeather(heWeather, sp, false);
                     rv.setAdapter(new NowWeatherAdapter(MainActivity.this, heWeather));
                     srl.setRefreshing(false);
+                    FinalApplication.buildNotification();
 //                                    if (heWeather.getNow() != null) {
 //                                        Log.d("HeWeather", heWeather.getNow().getFl() + "");
 //                                    } else Log.d("HeWeather", "response.getNow()=null");
