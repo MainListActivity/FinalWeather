@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             actionBar.setTitle(weather.getBasic().getCity());
             sv.getHolder().addCallback(this);
             Log.d(TAG, "103: weather.getBasic().getCity() != null");
-
+//            Log.e(TAG, "onCreate: "+weather.getNow().getTmp().length() );
             adapter = new NowWeatherAdapter(this, weather);
             rv.setAdapter(adapter);
             FinalApplication.buildNotification();

@@ -64,10 +64,10 @@ public class FinalApplication extends Application {
 
         builder.setContent(views);
         builder.setOngoing(true);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_ONE_SHOT);
         builder.setContentIntent(pendingIntent);
         builder.setSmallIcon(R.mipmap.main_icon_notify);
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(122, builder.build());
     }
 
 }

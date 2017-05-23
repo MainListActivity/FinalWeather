@@ -144,9 +144,32 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         holder.tv_now_pres.setText(now.getPres());
         holder.tv_now_vis.setText(now.getVis());
         String tmp = now.getTmp();
-        int shi = Integer.valueOf(tmp.substring(0, 1)) + R.mipmap.org4_widget_nw0;
-        int ge = Integer.valueOf(tmp.substring(1, 2)) + R.mipmap.org4_widget_nw0;
-
+        int shi = 0;
+        int ge = 0;
+        if (tmp.length() >= 2) {
+            try {
+                int temperature = Integer.valueOf(tmp);
+                if (temperature < 0) {
+                    holder.tv_weather_minus.setVisibility(View.VISIBLE);
+                    if (temperature>=-9){
+                        holder.iv_weather_du_shi.setVisibility(View.GONE);
+                        ge = Integer.valueOf(tmp.substring(1, 2)) + R.mipmap.org4_widget_nw0;
+                    }else{
+                        shi = Integer.valueOf(tmp.substring(1, 2)) + R.mipmap.org4_widget_nw0;
+                        ge = Integer.valueOf(tmp.substring(2, 3)) + R.mipmap.org4_widget_nw0;
+                    }
+                }else if (temperature>=10) {
+                    holder.tv_weather_minus.setVisibility(View.GONE);
+                    shi = Integer.valueOf(tmp.substring(0, 1)) + R.mipmap.org4_widget_nw0;
+                    ge = Integer.valueOf(tmp.substring(1, 2)) + R.mipmap.org4_widget_nw0;
+                }
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        } else {
+            holder.iv_weather_du_shi.setVisibility(View.GONE);
+            ge = Integer.valueOf(tmp.substring(0, 1)) + R.mipmap.org4_widget_nw0;
+        }
         holder.iv_weather_du_ge.setImageResource(ge);
         holder.iv_weather_du_shi.setImageResource(shi);
         // Log.d(TAG, "shi: " + Integer.valueOf(tmp.substring(0, 1)) + "\nge: " + Integer.valueOf(tmp.substring(1, 2)));
@@ -213,6 +236,7 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
         TextView tv_now_pres;
         TextView tv_now_vis;
         TextView tv_suggestion_txt;
+        TextView tv_weather_minus;
 
         ImageView iv_weather_icon;
         ImageView iv_wind_rotation;
@@ -260,6 +284,7 @@ public class NowWeatherAdapter extends RecyclerView.Adapter<NowWeatherAdapter.My
                     tv_now_pcpn = (TextView) view.findViewById(R.id.tv_now_pcpn);
                     tv_now_pres = (TextView) view.findViewById(R.id.tv_now_pres);
                     tv_now_vis = (TextView) view.findViewById(R.id.tv_now_vis);
+                    tv_weather_minus = (TextView) view.findViewById(R.id.tv_weather_minus);
                     tv_suggestion_txt = (TextView) view.findViewById(R.id.tv_suggestion_txt);
                     break;
                 case 1:
